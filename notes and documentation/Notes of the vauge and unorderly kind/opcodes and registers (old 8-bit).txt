@@ -1,0 +1,249 @@
+-- operations listed
+JUMP
+CALL
+RET
+(LOOP?)
+
+MOV
+PUSH
+PULL
+
+NOT
+AND
+OR
+XOR
+(XAND?)
+
+NEG
+ADD
+SUB
+MULT
+DIV
+
+DEC
+INC
+
+SHIFTL
+SHIFTR
+
+IN
+OUT
+
+TEST
+(CMP?)
+
+-- possible ways of making MOV
+MOVREG: OPCODE -> [ Reg A:4 | Reg B:4 ]
+MOVRAM: [REG A:4 | OPCODE] -> [ in/out:1 | address:15 ]
+
+
+-- operations nested and grouped by sort
+JUMP
+CALL, RET, MOVREG, (LOOP?, PUSHA?, POPA?)
+
+MOVRAM
+PUSH
+PULL
+
+OR, AND
+XOR, XAND
+ADD
+SUB
+
+NOT, NEG
+DEC, INC
+SHIFTL, SHIFTR
+
+IN, OUT
+
+TEST, CMP
+
+-- Registers
+(general purpose registers)
+0x0 = al (8-bit) : The low byte of ax, this register will be used by any 8 bit operation taking two registers as the destignation and first input
+0x1 = ah (8-bit) : The high byte of ax
+0x2 = bl (8-bit) : The low byte of bx
+0x3 = bh (8-bit) : The high byte of bx
+0x4 = ax (16-bit): this register will be used by any 16 bit operation taking two registers as the destignation and first input
+0x5 = bx (16-bit):
+0x6 = cx (16-bit):
+0x7 = dx (16-bit):
+(special purpose registers)
+0x8 = fs (8-bit) : holds the flags
+0x9 = ?? (8-bit) : reserved
+0xA = ?? (8-bit) : reserved
+0xB = os (8-bit) : hardwired to one. The input is ignored and the output is always one.
+0xC = cs (16-bit): holds the address of the next operation to run
+0xD = ss (16-bit): holds the address of the end of the stack
+0xE = rs (16-bit): holds the last used extension of an operation
+0xF = zs (16-bit): hardwired to zero. The input is ignored and the output is always zero.
+
+-- Flags
+(status flags)
+0x0 = ZF : zero flag
+0x1 = SF : sign flag
+0x2 = PF : parity flag
+0x3 = CF : carry & borrow flag
+0x4 = OF : overflow flag
+(control flags)
+0x5 = TF : trap flag?
+0x6 = IF : enable interrupt flag?
+0x7 = DR : direction flag?
+
+-- Conditions
+0x0 = Z		   : zero flag is set (number is equal to zero)
+0x1 = NZ	   : zero flag is clear (number is not equal to zero)
+0x2 = S  & NSZ : sign flag is set (number is positive or zero)
+0x3 = NS & SZ  : sign flag is clear (number is negative)
+0x4 = P		   : parity flag is set (number is even)
+0x5 = NP	   : parity flag is clear (number is uneven)
+0x6 = C		   : carry flag is set (the last operation had a carry or borrow)
+0x7 = NC	   : carry flag is clear (the last operation didn't have a carry or borrow)
+0x8 = O		   : overflow flag is set (the last operation had an overflow)
+0x9 = NO	   : overflow flag is clear (the last operation didn't have an overflow)
+0xA = LZ	   : sign flag is set and zero flag is clear (number is positive)
+0xB = NLZ	   : sign flag is clear or zero flag is set (number is negative or zero)
+0xC = ??	   : reserved
+0xD = ??	   : reserved
+0xE = A		   : always
+0xF = NA	   : never
+
+-- Bit layout operations
+
+[ condition:4 | opcode:4 ] -> [ address:16 ]
+0x0 = JUMP
+
+[ sec opcode:4 | opcode:4 ]
+0x1 = CALL, RET, MOVREG, (LOOP?, PUSHA?, POPA?)
+	(sec opcodes)
+	0x = CALL -> [ address:16 ]
+		
+	0X = LOOP -> [ address:16 ]
+		
+	0x = MOVREG -> [ source register:4 | target register:4 ]
+		
+	0x = RET
+		
+
+[ source/target register:4 | opcode:4 ] -> [ in/out:1 | address:15 ]
+0x2 = MOVRAM
+
+(or)
+[ source/target register:4 | opcode:4 ] -> [ in/out:1 | relative to stack:1 | address:14 ]
+0x2 = MOVRAM
+
+[ source register:4 | opcode:4 ]
+0x3 = PUSH
+
+[ target register:4 | opcode:4 ]
+0x4 = POP
+
+[ source register:3 | alt flag:1 | opcode:4 ]
+0x5 = OR & AND
+
+[ source register:3 | alt flag:1 | opcode:4 ]
+0x6 = XOR & XAND
+
+[ source register:3 | alt flag:1 | opcode:4 ]
+0x7 = ADD
+	Adds the selected register to al or ax when selecting an 8-bit or 16-bit register respectively
+	If the alt flag is set then it will use the carry flag to carry over to the least significant bit.
+
+[ source register:3 | alt flag:1 | opcode:4 ]
+0x8 = SUB
+	Subtracts the selected register to ah or ax when selecting an 8-bit or 16-bit register respectively
+	If the alt flag is set then it will use the carry flag to borrow the least significant bit.
+
+[ target register:3 | alt flag:1 | opcode:4 ]
+0xB = NOT & NEG
+	(normal)
+	sets all the bits of the selected register to it's inverse
+	(alt)
+	negates the selected register in an arithmetic manner
+
+[ target register:3 | alt flag:1 | opcode:4 ]
+0xC = INC, DEC
+
+[ target register:3 | alt flag:1 | opcode:4 ]
+0xD = SHIFTL, SHIFTR
+
+
+[ source/target register:3 | alt flag:1 | opcode:4 ] -> [ bus:8 ]
+0xE = IN, OUT
+
+
+[ source register:4 | opcode:4 ]
+0xF = TEST
+	Tests the selected registers and sets the status flags accordingly
+
+(or)
+[ source register:3 | alt flag:1 | opcode:4 ]
+0xF = TEST, CMP
+	Tests the selected registers and sets the status flags accordingly
+
+-- Micro operations
+0x0 = NXTO
+0x1 = CNXT
+0x2 = NXTB
+
+0x3 = 
+
+0x4 = RG>Y
+0x5 = Y>RG
+
+0x6 = RG>R
+0x7 = R>RG
+
+0x8 = NOT
+0x9 = OR
+0xA = AND
+0xB = XOR
+0xC = SHIFTL
+0xD = SHIFTR
+0xE = ADD
+0xF = SUB
+
+-- Micro operations additions
+T = output test Y
+S = switch ALU output A and B, when clear Y is connected to A and RG to B
+RG = register number (for both input and output)
+- OP3 = the first three bits of OP
+- OP4 = the first four bits of OP
+- RGA = Register AX or HL depending on the selected input register (only works correcty with OP3 as input)
+- SET = 16 bit one
+UC = use carry
+FC = force carry
+
+-- Operations to micro operations
+JUMP: NXTB NXTB CNXT RG>Y(RG:0xE) Y>RG(RG:0xC) NXTO
+CALL: 
+RET: 
+MOVREG: NXTB RG>Y(RG:RS*1-4) Y>RG(RG:RS*5-8) NXTO
+LOOP: 
+PUSHA: -
+POPA: -
+MOVRAM: 
+PUSH: RG>Y(RG:0xD) RG>R(RG:OP4) ADD(RG:0xD, C:16)
+POP: 
+OR: RG>Y(RG:RGA) OR(RG:OP3, T) Y>RG(RG:RGA) NXTO
+AND: RG>Y(RG:RGA) AND(RG:OP3, T) Y>RG(RG:RGA) NXTO
+XOR: RG>Y(RG:RGA) XOR(RG:OP3, T) Y>RG(RG:RGA) NXTO
+XAND: RG>Y(RG:RGA) XOR(RG:OP3) NOT(T) Y>RG(RG:RGA) NXTO
+ADD: RG>Y(RG:RGA) SUB(RG:OP3, T) Y>RG(RG:RGA) NXTO
+SUB: RG>Y(RG:RGA) SUB(RG:OP3, T) Y>RG(RG:RGA) NXTO
+MULT: -
+IMULT: -
+DIV: -
+IDIV: -
+NOT: RG>Y(RG:OP3) NOT(T) Y>RG(RG:OP3) NXTO
+NEG: RG>Y(RG:0xF) SUB(RG:OP3, T) Y>RG(RG:OP3) NXTO
+INC: RG>Y(RG:OP3) ADD(RG:0xF, FC, T) Y>RG(RG:OP3) NXTO
+DEC: RG>Y(RG:OP3) SUB(RG:0xF, FC, T) Y>RG(RG:OP3) NXTO
+SHIFTL: RG>Y(RG:OP3) SHIFTL(T) Y>RG(RG:OP3) NXTO
+SHIFTR: RG>Y(RG:OP3) SHIFTR(T) Y>RG(RG:OP3) NXTO
+IN: 
+OUT: 
+TEST: RG>Y(RG:OP3, T) NXTO
+CMP: RG>Y(RG:RGA) SUB(RG:OP3, T) NXTO
+
+

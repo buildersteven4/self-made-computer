@@ -1,0 +1,64 @@
+TODO: translate this
+
+???
+	- Idee begonnen tijdens gesprek met pasqual
+	- computer maken zonder "chips"
+	- groffe schatting gemaakt van noodzakelijke RAM op 1kB
+	- kleurenbeeldscherm als onmogelijk geacht wegens een te groot grafisch geheugen
+	- verscheidende manieren opgezocht om logic gates te maken met electronica
+	- in notepad begonnen met het schrijven van de noodzakelijke OP-codes, registers, flags en conditions
+	- In digisim begonnen met het maken van de CPU (begonnen een aantal logic gates aan een decoder)
+	- Begonnen aan de registers in digisim
+	- een aparte in en output gemaakt voor een aantal registers omdat ik voorspelde dat dat nodig was in een later stadia van de ontwikkeling
+	- simpele klok gemaakt die 8 pins omstebeurt op 1 zet, omdat ik er van uit ging dat vrij veel dingen niet tergelijk kunnen gebeuren, en daarmee dit de simpelste oplossing was
+
+3-10-2015
+	- Na wat googlen van andere CPU's in digisim achter de termen ALU en CU, opnieuw begonnen met de CPU op het register en de klok na
+
+4-10-2015
+	- Besloten dat een buffer register voor ALU A en B noodzakelijk is om te voorkomen dat het via Y gaat loopen (Y = !A -> A = Y -> A = !A)
+
+5-10-2015
+	- begin documentatie gedachtes
+	- bezig met de micro operations voor de CU
+	
+6-10-2015
+	- wegens consistentie en daarmee versimpelde bedrading heb ik besloten de opcode extensies in het register op te slaan in plaats van een intern register in de CU. Dit versimpelt het verdere gebruik van de data en het aantal nodige micro-opcodes. Daarintegen zorgt het wel voor moeilijkere bedrading voor de opslag van deze data sinds het alleen byte voor byte ontvangen kan worden.
+
+7-10-2015
+	- Na een schatting dat een keer en deel operation waarschijnlijk in de zestig micro-opcodes nodig heeft heb ik voor nu besloten om de keer en deel functies uit de lijst van operations te halen, deze kunnen beter later door software berekend worden.
+	
+11-11-2015
+	- paar dagen geleden een RAM lader gemaakt voor de CU. verrassend ingewikkeld door 16 bit. angezien ram meestal trager is dan de CPU moet het mischien aan gepast worden om de cycles over te slaan.
+	- ik denk een aantal OP-codes te verwijderen. CALL en RET omdat ze makelijk te vervangen zijn met PULL and PUSH. daarnaast wil ik PUSHA en PULLA verwijderen omdat ze veel meer micro-opcodes nodig hebben dan andere operations.
+
+17-11-2015
+	- RAM lader verwijderd, ik heb besloten dat dit niet bij de taken va de CU hoort. De CU is immers complex genoeg.
+	- nieuw externe RAM lader bedacht die het nieuwe address terug stuurt naar de CU. dit bespaart een cycle tijdens het laden van een niewe OP-code en het poppen en pushen op de stack. dat betekend ook dat er minder micro-opcodes nodig zijn per opcode.
+	- Besloten dat het zelf maken van RAM te veel werk is en aflied van intressantere zaken, hiervoor maken we dus een uitzondering en gebruiken een IC
+	
+21-11-2015
+	- Probleem ontdekt met de ADD micro-op. Overflow werkt incorrect bij het optellen van negatieve getallen. Blijkbaar was het fout om te denken dat overflow simpelweg de carry naar de meest significante bit is. Moet een nieuwe manier vinden om dat te bepalen.
+	
+22-11-2015
+	- Bedacht dat er nooit overflow is als één van de opgetelde waarden negatief is, en dat als ze bijde negatief zijn dan is er juist overflow als er geen carry is naar de laatste bit. Ik zoek nog naar de beste manier om dat te implementeren.
+
+23-11-2015
+	- Een manier gevonden om de overflow te implementeren: overflow = (Asig XAND Bsig) AND (Cinsig XAND (Asig NAND Bsig))
+	- Ik heb het gevoel dat dit simpeler kan, maar het is een insignificant onderdeel dus ik laat het hierbij.
+	- Na wat testen leek de vorige versie fout te zijn, weet dat niet zeker. Kort daarna een kleinere versie gemaakt die een gate minder nodig heeft. Dit was mogelijk doordat als de carry naar de laatste bit bijdrage levert aan het de overflow dan zijn de meeste significante bits van de input altijd gelijk. dus de NAND gate was onnodig.
+	- Het nieuwe model is: overflow = (Asig XOR Bsig) NOR (Cinsig XAND Asig)
+	- bij min lijkt de min-of-meer zelfde methode te werken, alleen moeten de XAND and XOR verwisseld worden, dit moet ik nog eens testen. het model voor min is dus: overflow = (Asig XAND Bsig) NOR (Binsig XOR Asig)
+	- note aan zelf: let op dat de timing van de registers goed aansluit met het unpoweren van de data input. anders zouden die elke cycle getrashed worden (dit geld voor alle registers, ook de interne)
+	
+28-11-2015
+	- Na wat overleg met cntkillme en esteva en lang na zitten denken heb ik besloten de instructies opnieuw te ontwerpen, dit is nu nog makelijk aangezien de CU nog niet helemaal klaar is.
+	- het idee is dat er geen belangrijke reden meer is om de instructies in een byte te proppen.
+	- voordelen 8-bit instructies:
+		- kost minder ruimte om op te slaan
+		- minder data verkeer tussen de CPU en het RAM
+	- voordelen 16-bit instructies:
+		- meer mogelijke instructies
+		- meer flexibileid van instructies
+		- instructies kunnen een vastere structuur hebben zonder daarbij een significante hoeveelheid mogelijke instructies op te offeren (wat de bedrading simpeler en eventueel sneller maakt)
+	- eerst waren de voordelen van 8-bit belangrijker omdat we zelf van plan waren het RAM te maken wat dus de hoeveelheid zwaar limiteerd, maar nu we IC gaan gebruiken is dat niet meer zo'n probleem, daarnaast is door de interface van het RAM het grotere data verkeer tussen de CPU en het RAM geen probleem omdat het RAM toch altijd 16 bits naar de CPU stuurt.
