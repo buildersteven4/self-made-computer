@@ -6,27 +6,45 @@ B: primary input
 mode A&B: determine the addressing mode of A and B (register if 0, ram if 1), if any of these is set the cpu will load the next 2 bytes as an extra argument for this instruction.
 address A&B: the address of the register if the respective mode bit is 0. or if the respective mode bit is 1 it determines the addressing mode
 
--- Addressing modes:
+-- Addressing modes A:
 (8-bit)
-0x0 = _[ax - #]
-0x1 = _[bx - #]
-0x2 = _[cx - #]
-0x3 = _[dx - #]
+0x0 = [ax + #]
+0x1 = [bx + #]
+0x2 = [cx + #]
+0x3 = [dx + #]
 (16-bit)
-0x4 = [ax - #]
-0x5 = [bx - #]
-0x6 = [cx - #]
-0x7 = [dx - #]
+0x4 = @[ax + #]
+0x5 = @[bx + #]
+0x6 = @[cx + #]
+0x7 = @[dx + #]
 (8-bit)
-0x8 = _#
-0x9 = _[#]
-0xA = _[cs - #]
-0xB = _[ss - #]
+0x8 = [cs + #]
+0x9 = [ss + #]
+0xA = [zs + #] or [#]
+0xB = [os + #] or [1 + #]
 (16-bit)
-0xC = #
-0xD = [#]
-0xE = [cs - #]
-0xF = [ss - #]
+0xC = @[cs + #]
+0xD = @[ss + #]
+0xE = @[zs + #] or @[#]
+0xF = @[os + #] or @[1 + #]
+
+-- Addressing modes B:
+0x0 = [ax + #]
+0x1 = [bx + #]
+0x2 = [cx + #]
+0x3 = [dx + #]
+0x4 = ax + #
+0x5 = bx + #
+0x6 = cx + #
+0x7 = dx + #
+0x8 = [cs + #]
+0x9 = [ss + #]
+0xA = [zs + #] or [#]
+0xB = [os + #] or [1 + #]
+0xC = cs + #
+0xD = ss + #
+0xE = zs + # or #
+0xF = os + # or 1 + #
 
 -- Registers
 (general purpose registers)
@@ -40,13 +58,13 @@ address A&B: the address of the register if the respective mode bit is 0. or if 
 0x7 = dx (16-bit):
 (special purpose registers)
 0x8 = fs (8-bit) : holds the flags
-0x9 = r1 (8-bit) : reserved
-0xA = r2 (8-bit) : reserved
+0x9 = is (8-bit) : interrupt register
+0xA = zs (8-bit) : hardwired to zero. The input is ignored and the output is always zero.
 0xB = os (8-bit) : hardwired to one. The input is ignored and the output is always one.
 0xC = cs (16-bit): holds the address of the next operation to run
 0xD = ss (16-bit): holds the address of the end of the stack
-0xE = rs (16-bit): holds the last used extension of an operation
-0xF = zs (16-bit): hardwired to zero. The input is ignored and the output is always zero.
+0xE = as (16-bit): holds input A of the current operation if input A is from the RAM
+0xF = bs (16-bit): holds input B of the current operation if input B is from the RAM
 
 -- Flags
 (status flags)
