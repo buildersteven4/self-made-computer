@@ -1,0 +1,1 @@
+TODO: fix zero flag checking for 8-bit values
