@@ -123,8 +123,8 @@ address A&B: the address of the register if the respective mode bit is 0. or if 
 0x23 = XOR : exclusive or
 0x24 = SHL/SAL : shift logical/arithmetric to the left
 0x25 = SHR : shift logical to the right
-0x26 = ADD
-0x27 = SUB
+0x26 = ADD : a + b
+0x27 = SUB : b - a
 
 0x28 = NNOT : not not/pass/mov (artifact in design, not a practical operation)
 0x29 = NOR : not or
