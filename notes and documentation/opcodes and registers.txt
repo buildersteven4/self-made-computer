@@ -1,154 +1,171 @@
 -- Instruction layout
 [ opcode:6 | mode A:1 | mode B:1 ][ address A:4 | address B:4 ] -> [ #:16 ]
-opcode: determines what operation to execute
+opcode: Determines what operation to execute.
 A: output and secondary input. The operation will be 8 or 16-bit corresponding to A.
 B: primary input
-mode A&B: determine the addressing mode of A and B (register if 0, ram if 1), if any of these is set the cpu will load the next 2 bytes as an extra argument for this instruction.
-address A&B: the address of the register if the respective mode bit is 0. or if the respective mode bit is 1 it determines the addressing mode
+mode A&B: Determines the addressing mode of A and B (register if 0, ram if 1), if any of these is set the cpu will load the next 2 bytes as an extra argument for this instruction.
+address A&B: The address of the register if the respective mode bit is 0, or if the respective mode bit is 1 it determines the addressing mode.
 
 -- Addressing modes A:
 (8-bit)
-0x0 = [ax + #]
-0x1 = [bx + #]
-0x2 = [cx + #]
-0x3 = [dx + #]
+	0x0 = [ax + #]
+	0x1 = [bx + #]
+	0x2 = [cx + #]
+	0x3 = [dx + #]
 (16-bit)
-0x4 = @[ax + #]
-0x5 = @[bx + #]
-0x6 = @[cx + #]
-0x7 = @[dx + #]
+	0x4 = @[ax + #]
+	0x5 = @[bx + #]
+	0x6 = @[cx + #]
+	0x7 = @[dx + #]
 (8-bit)
-0x8 = [cs + #]
-0x9 = [ss + #]
-0xA = [zs + #] or [#]
-0xB = [os + #] or [1 + #]
+	0x8 = [cs + #]
+	0x9 = [ss + #]
+	0xA = [zs + #] or [#]
+	0xB = [os + #] or [1 + #]
 (16-bit)
-0xC = @[cs + #]
-0xD = @[ss + #]
-0xE = @[zs + #] or @[#]
-0xF = @[os + #] or @[1 + #]
+	0xC = @[cs + #]
+	0xD = @[ss + #]
+	0xE = @[zs + #] or @[#]
+	0xF = @[os + #] or @[1 + #]
 
 -- Addressing modes B:
-0x0 = [ax + #]
-0x1 = [bx + #]
-0x2 = [cx + #]
-0x3 = [dx + #]
-0x4 = ax + #
-0x5 = bx + #
-0x6 = cx + #
-0x7 = dx + #
-0x8 = [cs + #]
-0x9 = [ss + #]
-0xA = [zs + #] or [#]
-0xB = [os + #] or [1 + #]
-0xC = cs + #
-0xD = ss + #
-0xE = zs + # or #
-0xF = os + # or 1 + #
+	0x0 = [ax + #]
+	0x1 = [bx + #]
+	0x2 = [cx + #]
+	0x3 = [dx + #]
+	0x4 = ax + #
+	0x5 = bx + #
+	0x6 = cx + #
+	0x7 = dx + #
+	0x8 = [cs + #]
+	0x9 = [ss + #]
+	0xA = [zs + #] or [#]
+	0xB = [os + #] or [1 + #]
+	0xC = cs + #
+	0xD = ss + #
+	0xE = zs + # or #
+	0xF = os + # or 1 + #
 
 -- Registers
 (general purpose registers)
-0x0 = al (8-bit) : The low byte of ax
-0x1 = ah (8-bit) : The high byte of ax
-0x2 = bl (8-bit) : The low byte of bx
-0x3 = bh (8-bit) : The high byte of bx
-0x4 = ax (16-bit): 
-0x5 = bx (16-bit):
-0x6 = cx (16-bit):
-0x7 = dx (16-bit):
+	0x0 = al (8-bit) : The low byte of ax
+	0x1 = ah (8-bit) : The high byte of ax
+	0x2 = bl (8-bit) : The low byte of bx
+	0x3 = bh (8-bit) : The high byte of bx
+	0x4 = ax (16-bit): 
+	0x5 = bx (16-bit):
+	0x6 = cx (16-bit):
+	0x7 = dx (16-bit):
 (special purpose registers)
-0x8 = fs (8-bit) : holds the flags
-0x9 = is (8-bit) : interrupt register
-0xA = zs (8-bit) : hardwired to zero. The input is ignored and the output is always zero.
-0xB = os (8-bit) : hardwired to one. The input is ignored and the output is always one.
-0xC = cs (16-bit): holds the address of the next operation to run
-0xD = ss (16-bit): holds the address of the end of the stack
-0xE = as (16-bit): holds input A of the current operation if input A is from the RAM
-0xF = bs (16-bit): holds input B of the current operation if input B is from the RAM
+	0x8 = fs (8-bit) : holds the flags
+	0x9 = is (8-bit) : interrupt register
+	0xA = zs (8-bit) : hardwired to zero. The input is ignored and the output is always zero.
+	0xB = os (8-bit) : hardwired to one. The input is ignored and the output is always one.
+	0xC = cs (16-bit): holds the address of the next operation to run
+	0xD = ss (16-bit): holds the address of the end of the stack
+	0xE = as (16-bit): holds input A of the current operation if input A is from the RAM
+	0xF = bs (16-bit): holds input B of the current operation if input B is from the RAM
 
 -- Flags
 (status flags)
-0x0 = ZF : zero flag
-0x1 = SF : sign flag
-0x2 = PF : parity flag
-0x3 = CF : carry & borrow flag
-0x4 = OF : overflow flag
+	0x0 = ZF : zero flag
+	0x1 = SF : sign flag
+	0x2 = PF : parity flag
+	0x3 = CF : carry & borrow flag
+	0x4 = OF : overflow flag
 (control flags)
-0x5 = TF : trap flag?
-0x6 = IF : enable interrupt flag?
-0x7 = DR : direction flag?
+	0x5 = TF : trap flag?
+	0x6 = IF : enable interrupt flag?
+	0x7 = DR : direction flag?
 
 -- Conditions
-0x0 = Z		   : zero flag is set (number is equal to zero)
-0x1 = NZ	   : zero flag is clear (number is not equal to zero)
-0x2 = S  & NSZ : sign flag is set (number is positive or zero)
-0x3 = NS & SZ  : sign flag is clear (number is negative)
-0x4 = P		   : parity flag is set (number is even)
-0x5 = NP	   : parity flag is clear (number is uneven)
-0x6 = C		   : carry flag is set (the last operation had a carry or borrow)
-0x7 = NC	   : carry flag is clear (the last operation didn't have a carry or borrow)
-0x8 = O		   : overflow flag is set (the last operation had an overflow)
-0x9 = NO	   : overflow flag is clear (the last operation didn't have an overflow)
-0xA = LZ	   : sign flag is set and zero flag is clear (number is positive)
-0xB = NLZ	   : sign flag is clear or zero flag is set (number is negative or zero)
-0xC = ??	   : reserved
-0xD = ??	   : reserved
-0xE = A		   : always
-0xF = NA	   : never
+	0x0 = Z		   : zero flag is set (number is equal to zero)
+	0x1 = NZ	   : zero flag is clear (number is not equal to zero)
+	0x2 = S  & NSZ : sign flag is set (number is positive or zero)
+	0x3 = NS & SZ  : sign flag is clear (number is negative)
+	0x4 = P		   : parity flag is set (number is even)
+	0x5 = NP	   : parity flag is clear (number is uneven)
+	0x6 = C		   : carry flag is set (the last operation had a carry or borrow)
+	0x7 = NC	   : carry flag is clear (the last operation didn't have a carry or borrow)
+	0x8 = O		   : overflow flag is set (the last operation had an overflow)
+	0x9 = NO	   : overflow flag is clear (the last operation didn't have an overflow)
+	0xA = LZ	   : sign flag is set and zero flag is clear (number is positive)
+	0xB = NLZ	   : sign flag is clear or zero flag is set (number is negative or zero)
+	0xC = ??	   : reserved
+	0xD = ??	   : reserved
+	0xE = A		   : always
+	0xF = NA	   : never
 
 -- Instructions
-0x00-0x0F = MOV : moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
+(move opcodes)
+	0x00-0x0F = MOV : moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
 
-0x10 = PUSH
-0x11 = POP
-0x12 = CALL
-0x13 = LOOP
-0x14 = TEST
-0x15 = CMP
-0x16 = IN
-0x17 = OUT
+(special opcodes)
+	0x10 = PUSH
+	0x11 = POP
+	0x12 = CALL
+	0x13 = LOOP
+	0x14 = TEST
+	0x15 = CMP
+	0x16 = IN
+	0x17 = OUT
 
-0x18 = EXIT : shutdown
-0x19 = NOP : no operation
-0x1A = HALT?
-0x1B = INT?
-0x1C = CLI?
-0x1D = STI?
-0x1E = ??
-0x1F = ??
+	0x18 = EXIT : shutdown
+	0x19 = NOP : no operation
+	0x1A = HALT?
+	0x1B = INT?
+	0x1C = CLI?
+	0x1D = STI?
+	0x1E = ??
+	0x1F = ??
 
-0x20 = NOT : not
-0x21 = OR : or
-0x22 = AND : and
-0x23 = XOR : exclusive or
-0x24 = SHL/SAL : shift logical/arithmetric to the left
-0x25 = SHR : shift logical to the right
-0x26 = ADD : a + b
-0x27 = SUB : b - a
+(ALU opcodes)
+	0x20 = OR a b
+	0x21 = OR !a b
+	0x22 = OR a !b
+	0x23 = OR !a !b
+	0x24 = AND a b
+	0x25 = AND !a b
+	0x26 = AND a !b
+	0x27 = AND !a !b
 
-0x28 = NNOT : not not/pass/mov (artifact in design, not a practical operation)
-0x29 = NOR : not or
-0x2A = NAND : not and
-0x2B = XAND/NXOR : exclusive and/not exclusive or
-0x2C = RCL : rotate left through carry
-0x2D = RCR : rotate right through carry
-0x2E = ADDC : addition with carry
-0x2F = SUBB : substraction with burrow
+	0x28 = XOR a b
+	0x29 = XOR !a b
+	0x2A = XOR a !b (useless)
+	0x2B = XOR !a !b (useless)
+	0x2C = ADD a b
+	0x2D = ADD !a b
+	0x2E = ADD a !b
+	0x2F = ADD !a !b (useless)
 
-0x30 = ROL : rotate left
-0x31 = ROR : rotate right
-0x32 = 
-0x33 = SAR : shift arithmetric to the right
-0x34 = 
-0x35 = 
-0x36 = 
-0x37 = 
+	0x30 = ADD1 a b
+	0x31 = ADD1 !a b
+	0x32 = ADD1 a !b
+	0x33 = ADD1 !a !b (useless)
+	0x34 = ADC a b
+	0x35 = ADC !a b
+	0x36 = ADC a !b
+	0x37 = ADC !a !b (useless)
 
-0x38 = 
-0x39 = 
-0x3A = 
-0x3B = 
-0x3C = 
-0x3D = 
-0x3E = 
-0x3F = 
+	0x38 = SHL a b
+	0x39 = SHL1 a b
+	0x3A = RCL a b
+	0x3B = ROL a b
+	0x3C = SHR a b
+	0x3D = SHR1 a b
+	0x3E = RCR a b
+	0x3F = ROR a b
+
+-- ALU micro instructions
+carry: Effects the output of the operations 0x5, 0x6 and 0x7. "carry" will be inverted if either "not A" or "not B" is set.
+not A: Inverts bits of input A.
+not B: Inverts bits of input B.
+operation: Determines what operation's answer to output.
+	0x0: pass A
+	0x1: pass B
+	0x2: or
+	0x3: and
+	0x4: exclusive or
+	0x5: add
+	0x6: shift left
+	0x7: shift right
