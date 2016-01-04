@@ -96,7 +96,7 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0xE = A		   : always
 	0xF = NA	   : never
 
--- Instructions
+-- OPcodes
 (move opcodes)
 	0x00-0x0F = MOV : moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
 
@@ -142,10 +142,10 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x31 = ADD1 !a b
 	0x32 = ADD1 a !b
 	0x33 = ADD1 !a !b (useless)
-	0x34 = ADC a b
-	0x35 = ADC !a b
-	0x36 = ADC a !b
-	0x37 = ADC !a !b (useless)
+	0x34 = ADDC a b
+	0x35 = ADDC !a b
+	0x36 = ADDC a !b
+	0x37 = ADDC !a !b (useless)
 
 	0x38 = SHL a b
 	0x39 = SHL1 a b
@@ -156,16 +156,32 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x3E = RCR a b
 	0x3F = ROR a b
 
--- ALU micro instructions
+-- pseudo instructions
+	NOT a = OR !a zs
+	XAND a b = XOR a !b
+	NOR a b = AND !a !b
+	NAND a b = OR !a !b
+	SUB a b = ADD a !b
+	SUB1 a b = ADD1 a !b
+	SUBB a b = ADDC a !b
+	NEG a = ADD !a zs
+	TEST a = OR zs a
+	NOP a = MOV-NA zs zs
+	PUSH a = MOV [ss] a ADD1 ss zs/os
+	POP a = SUB1 ss zs/os MOV a [ss]
+	CALL a = MOV bs ss+# MOV [ss] bs ADD1 ss os MOV cs a
+	RET = ADD1 ss !os MOV cs [ss+2]
+-- micro instructions
 carry: Effects the output of the operations 0x5, 0x6 and 0x7. "carry" will be inverted if either "not A" or "not B" is set.
 not A: Inverts bits of input A.
 not B: Inverts bits of input B.
 operation: Determines what operation's answer to output.
 	0x0: pass A
 	0x1: pass B
-	0x2: or
-	0x3: and
-	0x4: exclusive or
-	0x5: add
-	0x6: shift left
-	0x7: shift right
+	0x2: shift left B
+	0x3: shift right B
+	0x4: or
+	0x5: and
+	0x6: exclusive or
+	0x7: add
+test: will update status flags
