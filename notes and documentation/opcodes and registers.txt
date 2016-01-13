@@ -1,4 +1,5 @@
--- Instruction layout
+-- Instruction l
+ayout
 [ opcode:6 | mode A:1 | mode B:1 ][ address A:4 | address B:4 ] -> [ #:16 ]
 opcode: Determines what operation to execute.
 A: output and secondary input. The operation will be 8 or 16-bit corresponding to A.
@@ -101,23 +102,23 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x00-0x0F = MOV : moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
 
 (special opcodes)
-	0x10 = PUSH
-	0x11 = POP
-	0x12 = CALL
-	0x13 = LOOP
-	0x14 = TEST
-	0x15 = CMP
-	0x16 = IN
-	0x17 = OUT
+	0x10 = 
+	0x11 = 
+	0x12 = 
+	0x13 = 
+	0x14 = 
+	0x15 = 
+	0x16 = 
+	0x17 = 
 
 	0x18 = EXIT : shutdown
-	0x19 = NOP : no operation
-	0x1A = HALT?
-	0x1B = INT?
-	0x1C = CLI?
-	0x1D = STI?
-	0x1E = ??
-	0x1F = ??
+	0x19 = 
+	0x1A = 
+	0x1B = 
+	0x1C = 
+	0x1D = 
+	0x1E = 
+	0x1F = 
 
 (ALU opcodes)
 	0x20 = OR a b
@@ -171,6 +172,7 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	POP a = SUB1 ss zs/os MOV a [ss]
 	CALL a = MOV bs ss+# MOV [ss] bs ADD1 ss os MOV cs a
 	RET = ADD1 ss !os MOV cs [ss+2]
+
 -- micro instructions
 carry: Effects the output of the operations 0x5, 0x6 and 0x7. "carry" will be inverted if either "not A" or "not B" is set.
 not A: Inverts bits of input A.
