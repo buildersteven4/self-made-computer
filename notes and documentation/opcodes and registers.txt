@@ -49,21 +49,21 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 
 -- Registers
 (general purpose registers)
-	0x0 = al (8-bit) : The low byte of ax
-	0x1 = ah (8-bit) : The high byte of ax
-	0x2 = bl (8-bit) : The low byte of bx
-	0x3 = bh (8-bit) : The high byte of bx
-	0x4 = ax (16-bit): 
+	0x0 = al (8-bit) : The lower byte of ax
+	0x1 = ah (8-bit) : The higher byte of ax
+	0x2 = bl (8-bit) : The lower byte of bx
+	0x3 = bh (8-bit) : The higher byte of bx
+	0x4 = ax (16-bit):
 	0x5 = bx (16-bit):
 	0x6 = cx (16-bit):
 	0x7 = dx (16-bit):
+	0x8 = el (8-bit) : The lower byte of ex
+	0x9 = eh (8-bit) : The higher byte of ex
+	0xA = fl (8-bit) : The lower byte of fx
+	0xB = fh (8-bit) : The higher byte of fx
+	0xC = ex (16-bit):
+	0xD = fx (16-bit):
 (special purpose registers)
-	0x8 = fs (8-bit) : holds the flags
-	0x9 = is (8-bit) : interrupt register
-	0xA = zs (8-bit) : hardwired to zero. The input is ignored and the output is always zero.
-	0xB = os (8-bit) : hardwired to one. The input is ignored and the output is always one.
-	0xC = cs (16-bit): holds the address of the next operation to run
-	0xD = ss (16-bit): holds the address of the end of the stack
 	0xE = as (16-bit): holds input A of the current operation if input A is from the RAM
 	0xF = bs (16-bit): holds input B of the current operation if input B is from the RAM
 
@@ -72,12 +72,10 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x0 = ZF : zero flag
 	0x1 = SF : sign flag
 	0x2 = PF : parity flag
-	0x3 = CF : carry & borrow flag
-	0x4 = OF : overflow flag
+	0x3 = OF : overflow flag
+	0x4 = CF : carry & borrow flag
 (control flags)
-	0x5 = TF : trap flag?
-	0x6 = IF : enable interrupt flag?
-	0x7 = DR : direction flag?
+	0x5 = IF : enable interrupt flag
 
 -- Conditions
 	0x0 = Z		   : zero flag is set (number is equal to zero)
@@ -86,14 +84,14 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x3 = NS & SZ  : sign flag is clear (number is negative)
 	0x4 = P		   : parity flag is set (number is even)
 	0x5 = NP	   : parity flag is clear (number is uneven)
-	0x6 = C		   : carry flag is set (the last operation had a carry or borrow)
-	0x7 = NC	   : carry flag is clear (the last operation didn't have a carry or borrow)
-	0x8 = O		   : overflow flag is set (the last operation had an overflow)
-	0x9 = NO	   : overflow flag is clear (the last operation didn't have an overflow)
+	0x6 = O		   : overflow flag is set (the last operation had an overflow)
+	0x7 = NO	   : overflow flag is clear (the last operation didn't have an overflow)
+	0x8 = C		   : carry flag is set (the last operation had a carry or borrow)
+	0x9 = NC	   : carry flag is clear (the last operation didn't have a carry or borrow)
 	0xA = LZ	   : sign flag is set and zero flag is clear (number is positive)
 	0xB = NLZ	   : sign flag is clear or zero flag is set (number is negative or zero)
-	0xC = ??	   : reserved
-	0xD = ??	   : reserved
+	0xC = I		   : enable interrupt flag is set (interrupts will fire)
+	0xD = NI	   : enable interrupt flag is clear (interrupts won't fire)
 	0xE = A		   : always
 	0xF = NA	   : never
 
@@ -111,14 +109,14 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x16 = 
 	0x17 = 
 
-	0x18 = EXIT : shutdown
-	0x19 = 
-	0x1A = 
-	0x1B = 
-	0x1C = 
-	0x1D = 
-	0x1E = 
-	0x1F = 
+	0x18 = INT : backups all the registers and starts the interrupt handler
+	0x19 = IRET : restores all the registers and returns from the interrupt handler
+	0x1A = STI : enable/disables interrupts
+	0x1B = HLT : halts the CPU untill an external interrupt is triggered
+	0x1C = OUT a b : write b to output register a
+	0x1D = IN a b : request input from pheripiral b and write that to a
+	0x1E = CMP a b :
+	0x1F = TEST a b : 
 
 (ALU opcodes)
 	0x20 = OR a b
@@ -132,7 +130,7 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 
 	0x28 = XOR a b
 	0x29 = XOR !a b
-	0x2A = XOR a !b (useless)
+	0x2A = XOR a !b (duplicate)
 	0x2B = XOR !a !b (useless)
 	0x2C = ADD a b
 	0x2D = ADD !a b
@@ -167,7 +165,7 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	SUBB a b = ADDC a !b
 	NEG a = ADD !a zs
 	TEST a = OR zs a
-	NOP a = MOV-NA zs zs
+	NOP a = MOVNA zs zs
 	PUSH a = MOV [ss] a ADD1 ss zs/os
 	POP a = SUB1 ss zs/os MOV a [ss]
 	CALL a = MOV bs ss+# MOV [ss] bs ADD1 ss os MOV cs a
