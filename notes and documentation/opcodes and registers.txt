@@ -1,11 +1,11 @@
--- Instruction l
-ayout
-[ opcode:6 | mode A:1 | mode B:1 ][ address A:4 | address B:4 ] -> [ #:16 ]
+-- Instruction layout
+[ opcode:6 | mode A:1 | mode B:1 ][ address A:4 | address B:4 ][ #:16 ]
 opcode: Determines what operation to execute.
 A: output and secondary input. The operation will be 8 or 16-bit corresponding to A.
 B: primary input
-mode A&B: Determines the addressing mode of A and B (register if 0, ram if 1), if any of these is set the cpu will load the next 2 bytes as an extra argument for this instruction.
+mode A&B: Determines the addressing mode of A and B (register if 0, ram if 1)
 address A&B: The address of the register if the respective mode bit is 0, or if the respective mode bit is 1 it determines the addressing mode.
+#: The immidiate number, used in instructions that have mode A or B set to 1.
 
 -- Addressing modes A:
 (8-bit)
@@ -13,39 +13,39 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x1 = [bx + #]
 	0x2 = [cx + #]
 	0x3 = [dx + #]
+	0x4 = [fx + #]
+	0x5 = [cs + #]
+	0x6 = [ss + #]
+	0x7 = [#]
 (16-bit)
-	0x4 = @[ax + #]
-	0x5 = @[bx + #]
-	0x6 = @[cx + #]
-	0x7 = @[dx + #]
-(8-bit)
-	0x8 = [cs + #]
-	0x9 = [ss + #]
-	0xA = [zs + #] or [#]
-	0xB = [os + #] or [1 + #]
-(16-bit)
-	0xC = @[cs + #]
-	0xD = @[ss + #]
-	0xE = @[zs + #] or @[#]
-	0xF = @[os + #] or @[1 + #]
+	0x8 = @[ax + #]
+	0x9 = @[bx + #]
+	0xA = @[cx + #]
+	0xB = @[dx + #]
+	0xC = @[fx + #]
+	0xD = @[cs + #]
+	0xE = @[ss + #]
+	0xF = @[#]
 
 -- Addressing modes B:
+(read from RAM)
 	0x0 = [ax + #]
 	0x1 = [bx + #]
 	0x2 = [cx + #]
 	0x3 = [dx + #]
-	0x4 = ax + #
-	0x5 = bx + #
-	0x6 = cx + #
-	0x7 = dx + #
-	0x8 = [cs + #]
-	0x9 = [ss + #]
-	0xA = [zs + #] or [#]
-	0xB = [os + #] or [1 + #]
-	0xC = cs + #
-	0xD = ss + #
-	0xE = zs + # or #
-	0xF = os + # or 1 + #
+	0x4 = [fx + #]
+	0x5 = [cs + #]
+	0x6 = [ss + #]
+	0x7 = [#]
+(use the calculated number)
+	0x8 = ax + #
+	0x9 = bx + #
+	0xA = cx + #
+	0xB = dx + #
+	0xC = fx + #
+	0xD = cs + #
+	0xE = ss + #
+	0xF = #
 
 -- Registers
 (general purpose registers)
@@ -53,16 +53,16 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x1 = ah (8-bit) : The higher byte of ax
 	0x2 = bl (8-bit) : The lower byte of bx
 	0x3 = bh (8-bit) : The higher byte of bx
-	0x4 = ax (16-bit):
-	0x5 = bx (16-bit):
-	0x6 = cx (16-bit):
-	0x7 = dx (16-bit):
-	0x8 = el (8-bit) : The lower byte of ex
-	0x9 = eh (8-bit) : The higher byte of ex
-	0xA = fl (8-bit) : The lower byte of fx
-	0xB = fh (8-bit) : The higher byte of fx
+	0x4 = cl (8-bit) : The lower byte of cx
+	0x5 = ch (8-bit) : The higher byte of cx
+	0x6 = dl (8-bit) : The lower byte of dx
+	0x7 = dh (8-bit) : The higher byte of dx
+	0x8 = ax (16-bit):
+	0x9 = bx (16-bit):
+	0xA = cx (16-bit):
+	0xB = dx (16-bit):
 	0xC = ex (16-bit):
-	0xD = fx (16-bit):
+	0xD = fx (16-bit): Meant for very temporary data
 (special purpose registers)
 	0xE = as (16-bit): holds input A of the current operation if input A is from the RAM
 	0xF = bs (16-bit): holds input B of the current operation if input B is from the RAM
@@ -97,7 +97,7 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 
 -- OPcodes
 (move opcodes)
-	0x00-0x0F = MOV : moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
+	0x00-0x0F = MOV a b: moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
 
 (special opcodes)
 	0x10 = 
@@ -109,10 +109,10 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x16 = 
 	0x17 = 
 
-	0x18 = INT : backups all the registers and starts the interrupt handler
-	0x19 = IRET : restores all the registers and returns from the interrupt handler
-	0x1A = STI : enable/disables interrupts
-	0x1B = HLT : halts the CPU untill an external interrupt is triggered
+	0x18 = INT _ _: backups all the registers and starts the interrupt handler
+	0x19 = IRET _ _: restores all the registers and returns from the interrupt handler
+	0x1A = STI _ b: writes the least significant bit of b to IF (enables/disables interrupts)
+	0x1B = HLT _ _: halts the CPU untill an external interrupt is triggered
 	0x1C = OUT a b : write b to output register a
 	0x1D = IN a b : request input from pheripiral b and write that to a
 	0x1E = CMP a b :
@@ -156,20 +156,25 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0x3F = ROR a b
 
 -- pseudo instructions
-	NOT a = OR !a zs
+	NOT a    = OR !a 0x0
 	XAND a b = XOR a !b
-	NOR a b = AND !a !b
+	NOR a b  = AND !a !b
 	NAND a b = OR !a !b
-	SUB a b = ADD a !b
+	SUB a b  = ADD a !b
 	SUB1 a b = ADD1 a !b
 	SUBB a b = ADDC a !b
-	NEG a = ADD !a zs
-	TEST a = OR zs a
-	NOP a = MOVNA zs zs
-	PUSH a = MOV [ss] a ADD1 ss zs/os
-	POP a = SUB1 ss zs/os MOV a [ss]
-	CALL a = MOV bs ss+# MOV [ss] bs ADD1 ss os MOV cs a
-	RET = ADD1 ss !os MOV cs [ss+2]
+	NEG a    = ADD !a 0x0
+	NOP a    = MOVNA ax ax
+	PUSH a   = MOV [ss] a 
+	           ADD ss (0x1 or 0x2)
+	POP a    = SUB ss (0x1 or 0x2) 
+	           MOV a [ss]
+	CALL a   = MOV fx cs+0x
+	           MOV [ss] fx 
+			   ADD1 ss 0x2
+			   MOV cs a
+	RET      = SUB ss 0x2 
+	           MOV cs [ss]
 
 -- micro instructions
 carry: Effects the output of the operations 0x5, 0x6 and 0x7. "carry" will be inverted if either "not A" or "not B" is set.
