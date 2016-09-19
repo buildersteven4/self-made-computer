@@ -1,51 +1,85 @@
 -- Instruction layout
-[ opcode:6 | mode A:1 | mode B:1 ][ address A:4 | address B:4 ][ #:16 ]
+[ opcode:6 | address A:5 | address B:5 | #:16 ]
 opcode: Determines what operation to execute.
 A: output and secondary input. The operation will be 8 or 16-bit corresponding to A.
 B: primary input
-mode A&B: Determines the addressing mode of A and B (register if 0, ram if 1)
-address A&B: The address of the register if the respective mode bit is 0, or if the respective mode bit is 1 it determines the addressing mode.
 #: The immidiate number, used in instructions that have mode A or B set to 1.
 
--- Addressing modes A:
-(8-bit)
-	0x0 = [ax + #]
-	0x1 = [bx + #]
-	0x2 = [cx + #]
-	0x3 = [dx + #]
-	0x4 = [fx + #]
-	0x5 = [cs + #]
-	0x6 = [ss + #]
-	0x7 = [#]
-(16-bit)
-	0x8 = @[ax + #]
-	0x9 = @[bx + #]
-	0xA = @[cx + #]
-	0xB = @[dx + #]
-	0xC = @[fx + #]
-	0xD = @[cs + #]
-	0xE = @[ss + #]
-	0xF = @[#]
+-- address A:
+(8-bit registers)
+	0x00 = al
+	0x01 = ah
+	0x02 = bl
+	0x03 = bh
+	0x04 = cl
+	0x05 = ch
+	0x06 = dl
+	0x07 = dh
+(16-bit registers)
+	0x08 = ax
+	0x09 = bx
+	0x0A = cx
+	0x0B = dx
+	0x0C = ex
+	0x0D = fx
+	0x0E = pc
+	0x0F = sp
+(8-bit memory from RAM)
+	0x10 = [ax+#]
+	0x11 = [bx+#]
+	0x12 = [cx+#]
+	0x13 = [dx+#]
+	0x14 = [fx+#]
+	0x15 = [pc+#]
+	0x16 = [sp+#]
+	0x17 = [#]
+(16-bit memory from RAM)
+	0x18 = @[ax+#]
+	0x19 = @[bx+#]
+	0x1A = @[cx+#]
+	0x1B = @[dx+#]
+	0x1C = @[fx+#]
+	0x1D = @[pc+#]
+	0x1E = @[sp+#]
+	0x1F = @[#]
 
 -- Addressing modes B:
-(read from RAM)
-	0x0 = [ax + #]
-	0x1 = [bx + #]
-	0x2 = [cx + #]
-	0x3 = [dx + #]
-	0x4 = [fx + #]
-	0x5 = [cs + #]
-	0x6 = [ss + #]
-	0x7 = [#]
-(use the calculated number)
-	0x8 = ax + #
-	0x9 = bx + #
-	0xA = cx + #
-	0xB = dx + #
-	0xC = fx + #
-	0xD = cs + #
-	0xE = ss + #
-	0xF = #
+(8-bit registers)
+	0x00 = al
+	0x01 = ah
+	0x02 = bl
+	0x03 = bh
+	0x04 = cl
+	0x05 = ch
+	0x06 = dl
+	0x07 = dh
+(16-bit registers)
+	0x08 = ax
+	0x09 = bx
+	0x0A = cx
+	0x0B = dx
+	0x0C = ex
+	0x0D = fx
+	0x0E = pc
+	0x0F = sp
+(memory from RAM)
+	0x10 = [ax+#]
+	0x11 = [bx+#]
+	0x12 = [cx+#]
+	0x13 = [dx+#]
+	0x14 = [fx+#]
+	0x15 = [pc+#]
+	0x16 = [sp+#]
+	0x17 = [#]
+(immidiate offset with register)
+	0x18 = ax+#
+	0x19 = bx+#
+	0x1A = cx+#
+	0x1B = dx+#
+	0x1C = fx+#
+	0x1D = pc+#
+	0x1E = sp+#
+	0x1F = #
 
 -- Registers
 (general purpose registers)
@@ -64,57 +98,77 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	0xC = ex (16-bit):
 	0xD = fx (16-bit): Meant for very temporary data
 (special purpose registers)
-	0xE = as (16-bit): holds input A of the current operation if input A is from the RAM
-	0xF = bs (16-bit): holds input B of the current operation if input B is from the RAM
+	0xE = pc (16-bit): holds the adress of the next instruction to run
+	0xF = sp (16-bit): holds the adress of the end of the stack
 
 -- Flags
 (status flags)
-	0x0 = ZF : zero flag
-	0x1 = SF : sign flag
-	0x2 = PF : parity flag
-	0x3 = OF : overflow flag
-	0x4 = CF : carry & borrow flag
+	ZF : zero flag
+	SF : sign flag
+	PF : parity flag
+	OF : overflow flag
+	CF : carry & borrow flag
 (control flags)
-	0x5 = IF : enable interrupt flag
+	IF : enable interrupt flag
 
 -- Conditions
 	0x0 = Z		   : zero flag is set (number is equal to zero)
 	0x1 = NZ	   : zero flag is clear (number is not equal to zero)
-	0x2 = S  & NSZ : sign flag is set (number is positive or zero)
-	0x3 = NS & SZ  : sign flag is clear (number is negative)
+	0x2 = S        : sign flag is set (number is positive or zero)
+	0x3 = NS       : sign flag is clear (number is negative)
 	0x4 = P		   : parity flag is set (number is even)
 	0x5 = NP	   : parity flag is clear (number is uneven)
 	0x6 = O		   : overflow flag is set (the last operation had an overflow)
 	0x7 = NO	   : overflow flag is clear (the last operation didn't have an overflow)
 	0x8 = C		   : carry flag is set (the last operation had a carry or borrow)
 	0x9 = NC	   : carry flag is clear (the last operation didn't have a carry or borrow)
-	0xA = LZ	   : sign flag is set and zero flag is clear (number is positive)
-	0xB = NLZ	   : sign flag is clear or zero flag is set (number is negative or zero)
 	0xC = I		   : enable interrupt flag is set (interrupts will fire)
 	0xD = NI	   : enable interrupt flag is clear (interrupts won't fire)
+	
+	SLE
+	SS
+	SL
+	SSE
+	US
+	ULE
+	USE
+	UL
+	
 	0xE = A		   : always
 	0xF = NA	   : never
 
+	Z
+	S
+	P
+	O
+	
+	C
+	C or Z
+	(S xand O) nor Z
+	S xor O
+	
+	A
+	
 -- OPcodes
 (move opcodes)
-	0x00-0x0F = MOV a b: moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
+	0x00-0x0F = MOVcond a b: moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
 
 (special opcodes)
-	0x10 = 
-	0x11 = 
+	0x10 = MOV a b: moves value from B to A
+	0x11 = NOP _ _: does nothing (actually a move never statement)
 	0x12 = 
 	0x13 = 
 	0x14 = 
 	0x15 = 
 	0x16 = 
-	0x17 = 
+	0x17 = FARJMP a b #:
 
 	0x18 = INT _ _: backups all the registers and starts the interrupt handler
 	0x19 = IRET _ _: restores all the registers and returns from the interrupt handler
 	0x1A = STI _ b: writes the least significant bit of b to IF (enables/disables interrupts)
 	0x1B = HLT _ _: halts the CPU untill an external interrupt is triggered
-	0x1C = OUT a b : write b to output register a
-	0x1D = IN a b : request input from pheripiral b and write that to a
+	0x1C = OUT a b: write b to output register a
+	0x1D = IN a b: request input from pheripiral b and write that to a
 	0x1E = CMP a b :
 	0x1F = TEST a b : 
 
@@ -166,8 +220,8 @@ address A&B: The address of the register if the respective mode bit is 0, or if 
 	NEG a    = ADD !a 0x0
 	NOP a    = MOVNA ax ax
 	PUSH a   = MOV [ss] a 
-	           ADD ss (0x1 or 0x2)
-	POP a    = SUB ss (0x1 or 0x2) 
+	           ADD ss 0x2
+	POP a    = SUB ss 0x2 
 	           MOV a [ss]
 	CALL a   = MOV fx cs+0x
 	           MOV [ss] fx 
