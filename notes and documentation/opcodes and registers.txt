@@ -96,9 +96,9 @@ B: primary input
 	0xA = cx (16-bit):
 	0xB = dx (16-bit):
 	0xC = ex (16-bit):
-	0xD = fx (16-bit): Meant for very temporary data
 (special purpose registers)
-	0xE = pc (16-bit): holds the adress of the next instruction to run
+	0xD = fx (16-bit): Meant for very temporary data, but that is purely a suggestion
+	0xE = pc (16-bit): Meant for the adress of the next instruction to run, but that is purely a suggestion
 	0xF = sp (16-bit): holds the adress of the end of the stack
 
 -- Flags
@@ -155,22 +155,22 @@ B: primary input
 
 (special opcodes)
 	0x10 = MOV a b: moves value from B to A
-	0x11 = NOP _ _: does nothing (actually a move never statement)
-	0x12 = 
+	0x11 = 
+	0x12 = WRI _ b: (WRite Interrupt enabled) writes the least significant bit of b to IF (enables/disables interrupts)
 	0x13 = 
-	0x14 = 
-	0x15 = 
-	0x16 = 
-	0x17 = FARJMP a b #:
+	0x14 = ISTR a b: (Internal SToRe) writes b to internal register a 
+	0x15 = ILD a b: (Internal LoaD) writes internal register b to a
+	0x16 = OUT a b: (OUTput) write b to output register a
+	0x17 = IN a b: (INput) requests input from pheripiral b and writes the input to a (does not yield, if no input is recieved in time the input will default to zero)
 
-	0x18 = INT _ _: backups all the registers and starts the interrupt handler
-	0x19 = IRET _ _: restores all the registers and returns from the interrupt handler
-	0x1A = STI _ b: writes the least significant bit of b to IF (enables/disables interrupts)
-	0x1B = HLT _ _: halts the CPU untill an external interrupt is triggered
-	0x1C = OUT a b: write b to output register a
-	0x1D = IN a b: request input from pheripiral b and write that to a
-	0x1E = CMP a b :
-	0x1F = TEST a b : 
+	0x18 = BACK _ _: (BACKup) backups all the registers
+	0x19 = FRET _ _: (Full REsTore) restores all the registers and marks that the there is no interrupt being handled
+	0x1A = PRET _ _: (Partial REsTore) restores the pc, flag and segment registers and marks that the there is no interrupt being handled
+	0x1B = FJMP _ _: (Far JuMP) restores the pc, flag and segment registers
+	0x1C = HLT _ _: (HaLT) halts the CPU untill an external interrupt is triggered
+	0x1D = NOP _ _: (No OPeration) does nothing (actually a move never statement)
+	0x1E = CMP a b : (CoMPare)
+	0x1F = TEST a b : (TEST)
 
 (ALU opcodes)
 	0x20 = OR a b
@@ -218,7 +218,6 @@ B: primary input
 	SUB1 a b = ADD1 a !b
 	SUBB a b = ADDC a !b
 	NEG a    = ADD !a 0x0
-	NOP a    = MOVNA ax ax
 	PUSH a   = MOV [ss] a 
 	           ADD ss 0x2
 	POP a    = SUB ss 0x2 
@@ -244,3 +243,14 @@ operation: Determines what operation's answer to output.
 	0x6: exclusive or
 	0x7: add
 test: will update status flags
+
+-- prossesses:
+	interrupt:
+		backup
+		CS = intCS
+		DS = intDS
+		PC = intPC
+	iret:
+		restore
+	context save: 
+		
