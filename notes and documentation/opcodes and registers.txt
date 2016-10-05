@@ -98,8 +98,8 @@ B: primary input
 	0xC = ex (16-bit):
 (special purpose registers)
 	0xD = fx (16-bit): Meant for very temporary data, but that is purely a suggestion
-	0xE = pc (16-bit): Meant for the adress of the next instruction to run, but that is purely a suggestion
-	0xF = sp (16-bit): holds the adress of the end of the stack
+	0xE = sp (16-bit): Meant for the adress of the end of the stack, but that is purely a suggestion
+	0xF = pc (16-bit): Holds the adress of the next instruction to run
 
 -- Flags
 (status flags)
@@ -148,7 +148,45 @@ B: primary input
 	S xor O
 	
 	A
-	
+
+-- internal registers
+	(8-bit internal registers)
+	0x00 = reserved
+	0x01 = reserved
+	0x02 = reserved
+	0x03 = reserved
+	0x04 = reserved
+	0x05 = reserved
+	0x06 = reserved
+	0x07 = reserved
+	(16-bit internal registers)
+	0x08 = sfb
+	0x09 = pcb
+	0x0A = is
+	0x0B = ipc
+	0x0C = reserved
+	0x0D = reserved
+	0x0E = reserved
+	0x0F = reserved
+	(8-bit internal registers)
+	0x10 = reserved
+	0x11 = reserved
+	0x12 = reserved
+	0x13 = reserved
+	0x14 = reserved
+	0x15 = reserved
+	0x16 = reserved
+	0x17 = reserved
+	(16-bit internal registers)
+	0x18 = reserved
+	0x19 = reserved
+	0x1A = reserved
+	0x1B = reserved
+	0x1C = reserved
+	0x1D = reserved
+	0x1E = reserved
+	0x1F = reserved
+
 -- OPcodes
 (move opcodes)
 	0x00-0x0F = MOVcond a b: moves value from B to A if the condition (determined by the first 4 bits of the opcode) is met
