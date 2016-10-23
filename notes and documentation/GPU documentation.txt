@@ -1,0 +1,49 @@
+-- Color layout
+	[ Red:2 | Green:3 | Blue:2 | Alpha:1 ]
+	
+-- Draw image procedure
+	-- Input registers
+		20b W_addr
+		20b R_addr
+		16b W_skip
+		16b R_skip
+		16b W
+		16b H
+
+	-- Internal registers
+	(cache related registers)
+		17b cache_addr[2]
+		8*8b cache[2]
+		1b primary_cache
+	(state related registers)
+		16b W_backup
+		1b working
+
+	-- Pseudo code
+		while (working) {
+			if (cache_addr[primary_cache] != R_addr[3:19]) {
+				// update primary cache
+				cache[primary_cache] = VRAM[R_addr[3:19]]
+				cache_addr[primary_cache] = R_addr[3:19]
+			} else if(cache_addr[!primary_cache] != R_addr[3:19] + 1) {
+				// update secondary cache
+				cache[!primary_cache] = VRAM[R_addr[3:19] + 1]
+				cache_addr[primary_cache] = R_addr[3:19] + 1
+			} else {
+				// draw pixels
+				8b temp[16]
+				temp[0:7] = cache[primary_cache]
+				temp[8:15] = cache[!primary_cache]
+				
+				if (W > 8 - W_addr[0:2]) {
+					W_addr := W_addr + (8 - W_addr[0:2])
+					R_addr := R_addr + (8 - W_addr[0:2])
+					W := W - (8 - W_addr[0:2])
+				} else {
+					W_addr := W_addr + (W + W_skip)
+					R_addr := R_addr + (W + R_skip)
+					W := W_backup
+				}
+			}
+			wait()
+		}

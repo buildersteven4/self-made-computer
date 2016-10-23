@@ -1,9 +1,9 @@
 -- Instruction layout
-[ opcode:6 | address A:5 | address B:5 | #:16 ]
-opcode: Determines what operation to execute.
-A: output and secondary input. The operation will be 8 or 16-bit corresponding to A.
-B: primary input
-#: The immidiate number, used in instructions that have mode A or B set to 1.
+	[ opcode:6 | address A:5 | address B:5 | #:16 ]
+	opcode: Determines what operation to execute.
+	A: output and secondary input. The operation will be 8 or 16-bit corresponding to A.
+	B: primary input
+	#: The immidiate number, used in instructions that have mode A or B set to 1.
 
 -- address A:
 (8-bit registers)
@@ -150,7 +150,7 @@ B: primary input
 	A
 
 -- internal registers
-	(8-bit internal registers)
+(8-bit internal registers)
 	0x00 = reserved
 	0x01 = reserved
 	0x02 = reserved
@@ -159,33 +159,33 @@ B: primary input
 	0x05 = reserved
 	0x06 = reserved
 	0x07 = reserved
-	(16-bit internal registers)
-	0x08 = sfb
-	0x09 = pcb
-	0x0A = is
-	0x0B = ipc
+(16-bit internal registers)
+	0x08 = bpc
+	0x09 = bsf
+	0x0A = ipc
+	0x0B = is
 	0x0C = reserved
 	0x0D = reserved
 	0x0E = reserved
 	0x0F = reserved
-	(8-bit internal registers)
-	0x10 = reserved
-	0x11 = reserved
-	0x12 = reserved
-	0x13 = reserved
-	0x14 = reserved
-	0x15 = reserved
-	0x16 = reserved
-	0x17 = reserved
-	(16-bit internal registers)
-	0x18 = reserved
-	0x19 = reserved
-	0x1A = reserved
-	0x1B = reserved
-	0x1C = reserved
-	0x1D = reserved
-	0x1E = reserved
-	0x1F = reserved
+(8-bit internal registers)
+	0x10 = undefined
+	0x11 = undefined
+	0x12 = undefined
+	0x13 = undefined
+	0x14 = undefined
+	0x15 = undefined
+	0x16 = undefined
+	0x17 = undefined
+(16-bit internal registers)
+	0x18 = undefined
+	0x19 = undefined
+	0x1A = undefined
+	0x1B = undefined
+	0x1C = undefined
+	0x1D = undefined
+	0x1E = undefined
+	0x1F = undefined
 
 -- OPcodes
 (move opcodes)
