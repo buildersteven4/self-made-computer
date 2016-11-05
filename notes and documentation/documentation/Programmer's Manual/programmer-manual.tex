@@ -1,20 +1,22 @@
-\documentclass[twoside,a4paper]{memoir}
 
+\documentclass[twoside,a4paper]{memoir}
 \begin{document}
 \title{SGPC Programmer's Manual}
 \author{Steven Vroom}
 \date{November 2016}
 \maketitle
 \cleardoublepage
+\setcounter{tocdepth}{3}
 \tableofcontents
 \cleardoublepage
 
-\chapter*{About This Book}
+\chapter*{About This Manual}
 \section*{Related Documentation}
 \section*{Organization}
 \section*{Conventions}
 \section*{Acronyms and Abbreviations}
 
+\mainmatter
 \chapter{Overview}
 \section{SGPC Architecture Overview}
 \section{Registers}
@@ -30,15 +32,35 @@
 \chapter{Register Set}
 \section{General-Purpose Registers}
 \subsection{Stack Pointer Register (SP)}
-\section{Program Counter (PC)}
-\section{Section Registers}
-\section{Backup Registers}
-\section{Interrupt Registers}
-\section{Output Registers}
+\section{Special-Purpose Registers}
+\subsection{Program Counter (PC)}
+\subsection{Section Registers}
+\subsection{Backup Registers}
+\subsection{Interrupt Registers}
+\subsection{Output Registers}
 
 \chapter{Operand Conventions and Addressing Modes}
+\section{Operand Conventions}
+\subsection{Bit and Byte Ordering}
+\subsection{Aligned and Misaligned Memory Access}
+\section{Addressing Modes}
+\subsection{Not From Memory}
+\subsubsection{Register Direct}
+\subsubsection{Absolute}
+\subsubsection{Register with displacement}
+\subsection{From Memory}
+\subsubsection{Direct}
+\subsubsection{Base Plus Displacement}
 
 \chapter{Instruction Set Summary}
+\section{Instruction Types}
+\subsection{Move Instructions}
+\subsection{Arithimic Instructions}
+\subsection{Control Instructions}
+\subsection{Reserved Instructions}
+\subsection{Artifact Instructions}
+\section{Instruction Layout}
+\subsection{exceptions}
 
 \chapter{Interrupts}
 
@@ -48,13 +70,14 @@
 
 \chapter{Instruction Set}
 
-\chapter{Appendix A: Instruction Set Listings}
+\appendix
+\chapter{Instruction Set Listings}
 
-\chapter{Appendix B: Simplified Mnemonics}
+\chapter{Simplified Mnemonics}
 
-\chapter{Appendix C: Common Procedures}
+\chapter{Common Procedures}
 
-\chapter{Appendix D: Standard Interrupts and I/O-ports}
+\chapter{Standard Interrupts and I/O-ports}
 \section{Programmable Interrupt Controller (PIC)}
 \section{Keyboard}
 \section{Programmable Interrupt Timer (PIT)}
