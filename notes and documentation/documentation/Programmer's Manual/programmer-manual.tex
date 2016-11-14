@@ -1,21 +1,26 @@
+\documentclass[oneside, a4paper]{memoir}
 
-\documentclass[twoside,a4paper]{memoir}
 \begin{document}
+% Title
 \title{SGPC Programmer's Manual}
 \author{Steven Vroom}
 \date{November 2016}
 \maketitle
 \cleardoublepage
-\setcounter{tocdepth}{3}
+
+% Front Matter 
+\frontmatter
+\setcounter{tocdepth}{2}
 \tableofcontents
 \cleardoublepage
 
-\chapter*{About This Manual}
-\section*{Related Documentation}
-\section*{Organization}
-\section*{Conventions}
-\section*{Acronyms and Abbreviations}
+\chapter{About This Manual}
+\section{Related Documentation}
+\section{Organization}
+\section{Conventions}
+\section{Acronyms and Abbreviations}
 
+% Main Matter
 \mainmatter
 \chapter{Overview}
 \section{SGPC Architecture Overview}
@@ -30,14 +35,45 @@
 \section{Memory Management Model}
 
 \chapter{Register Set}
-\section{General-Purpose Registers}
+This chapter describes the registers. The registers are seperated in four groups based on accessability.
+\section{Foreground Registers}
+The foreground registers are the registers all regular instructions can read from and write to. There are eight 8-bit and eight 16-bit foreground registers. These registers are preserved in interrupts.
+\begin{table}[]
+\centering
+\caption{List of Foreground Registers}
+\label{List of Foreground Registers}
+\begin{tabular}{|l|l|l|l|}
+\hline
+ID  & Mnonic & Descriptive Name      & Length in bits \\ \hline
+0x0 & al     & The lower byte of ax  & 8              \\ \hline
+0x1 & ah     & The higher byte of ax & 8              \\ \hline
+0x2 & bl     & The lower byte of bx  & 8              \\ \hline
+0x3 & bh     & The higher byte of bx & 8              \\ \hline
+0x4 & cl     & The lower byte of cx  & 8              \\ \hline
+0x5 & ch     & The higher byte of cx & 8              \\ \hline
+0x6 & dl     & The lower byte of dx  & 8              \\ \hline
+0x7 & dh     & The higher byte of dx & 8              \\ \hline
+0x8 & ax     & The first GPR         & 16             \\ \hline
+0x9 & bx     & The second GPR        & 16             \\ \hline
+0xA & cx     & The third GPR         & 16             \\ \hline
+0xB & dx     & The fourth GPR        & 16             \\ \hline
+0xC & ex     & The fifth GPR         & 16             \\ \hline
+0xD & tm     & Temporary data        & 16             \\ \hline
+0xE & sp     & Stack pointer         & 16             \\ \hline
+0xF & pc     & Program counter       & 16             \\ \hline
+\end{tabular}
+\end{table}
+\subsection{General-Purpose Registers (GPRs)}
+These instruction
 \subsection{Stack Pointer Register (SP)}
-\section{Special-Purpose Registers}
-\subsection{Program Counter (PC)}
-\subsection{Section Registers}
+\subsection{Program Counter Register (PC)}
+\section{Background Registers}
 \subsection{Backup Registers}
 \subsection{Interrupt Registers}
-\subsection{Output Registers}
+\section{Indirect Registers}
+\subsection{Flags Register}
+\subsection{Section Registers}
+\section{Output Registers}
 
 \chapter{Operand Conventions and Addressing Modes}
 \section{Operand Conventions}
@@ -59,25 +95,54 @@
 \subsection{Control Instructions}
 \subsection{Reserved Instructions}
 \subsection{Artifact Instructions}
-\section{Instruction Layout}
+\section{Instruction Format}
 \subsection{exceptions}
 
+\chapter{Memory Management}
+\section{Segments}
+\subsection{Base}
+\subsection{Limit}
+\section{Code Segment (CS)}
+\section{Data Segment (DS)}
+\section{Segment Switching}
+\section{Changing Segments}
+
 \chapter{Interrupts}
+\section{Interrupt Enabling/Disabling}
+\subsection{Interrupt Enabled Flag}
+\subsection{Internal Interrupt Mask}
+\subsection{Programmable Interrupt Controller (PIC)}
+\section{State Preservation}
+\subsection{Backup}
+\subsection{Full Restore}
+\subsection{Partial Restore}
+\section{Interrupt Service Routine (ISR)}
+\subsection{Interrupt Far Jump}
+\subsection{Return to Context}
+\subsection{Switch Context}
 
 \chapter{I/O Conventions}
-
-\chapter{Memory Management}
+\section{Reading Input}
+\section{Writing Output}
+\subsection{Problem with Interrupts}
 
 \chapter{Instruction Set}
+\section*{0x00: MOVZ}
+\section*{0x01: MOVNZ}
+\section*{0x02: MOVS}
+\section*{0x03: MOVNS}
+\section*{...}
 
+% Appendix
 \appendix
+%\backmatter
 \chapter{Instruction Set Listings}
 
 \chapter{Simplified Mnemonics}
 
 \chapter{Common Procedures}
 
-\chapter{Standard Interrupts and I/O-ports}
+\chapter{Standard Peripherals}
 \section{Programmable Interrupt Controller (PIC)}
 \section{Keyboard}
 \section{Programmable Interrupt Timer (PIT)}
