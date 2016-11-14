@@ -1,5 +1,7 @@
 \documentclass[oneside, a4paper]{memoir}
 
+\usepackage{multirow}
+
 \begin{document}
 % Title
 \title{SGPC Programmer's Manual}
@@ -137,6 +139,80 @@ These instruction
 \appendix
 %\backmatter
 \chapter{Instruction Set Listings}
+\begin{table}[]
+\centering
+\caption{My caption}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\multicolumn{3}{|l|}{\textbf{Opcode}} & \multirow{2}{*}{\textbf{Memnonic}} & \multirow{2}{*}{\textbf{Operand A}} & \multirow{2}{*}{\textbf{Operand B}} \\ \cline{1-3}
+\textbf{Decimal} & \textbf{Hex} & \textbf{Binary} &  &  &  \\ \hline
+0  & 0x00 & 000000 & MOV   & A & B \\ \hline
+1  & 0x01 & 000001 & MOV   & A & B \\ \hline
+2  & 0x02 & 000010 & MOV   & A & B \\ \hline
+3  & 0x03 & 000011 & MOV   & A & B \\ \hline
+4  & 0x04 & 000100 & MOV   & A & B \\ \hline
+5  & 0x05 & 000101 & MOV   & A & B \\ \hline
+6  & 0x06 & 000110 & MOV   & A & B \\ \hline
+7  & 0x07 & 000111 & MOV   & A & B \\ \hline
+8  & 0x08 & 001000 & MOV   & A & B \\ \hline
+9  & 0x09 & 001001 & MOV   & A & B \\ \hline
+10 & 0x0A & 001010 & MOV   & A & B \\ \hline
+11 & 0x0B & 001011 & MOV   & A & B \\ \hline
+12 & 0x0C & 001100 & MOV   & A & B \\ \hline
+13 & 0x0D & 001101 & MOV   & A & B \\ \hline
+14 & 0x0E & 001110 & MOV  & A & B \\ \hline
+15 & 0x0F & 001111 & MOV  & A & B \\ \hline
+16 & 0x10 & 000000 & MOV  & A & B \\ \hline
+17 & 0x11 & 000001 & MOV  & A & B \\ \hline
+18 & 0x12 & 000010 & MOV  & A & B \\ \hline
+19 & 0x13 & 000011 & MOV  & A & B \\ \hline
+20 & 0x14 & 000100 & MOV  & A & B \\ \hline
+21 & 0x15 & 000101 & MOV  & A & B \\ \hline
+22 & 0x16 & 000110 & MOV  & A & B \\ \hline
+23 & 0x17 & 000111 & MOV  & A & B \\ \hline
+24 & 0x18 & 001000 & MOV  & A & B \\ \hline
+25 & 0x19 & 001001 & MOV  & A & B \\ \hline
+26 & 0x1A & 001010 & MOV  & A & B \\ \hline
+27 & 0x1B & 001011 & MOV  & A & B \\ \hline
+28 & 0x1C & 001100 & MOV  & A & B \\ \hline
+29 & 0x1D & 001101 & MOV  & A & B \\ \hline
+30 & 0x1E & 001110 & MOV  & A & B \\ \hline
+31 & 0x1F & 001111 & MOV  & A & B \\ \hline
+32 & 0x20 & 000000 & MOV  & A & B \\ \hline
+33 & 0x21 & 000001 & MOV  & A & B \\ \hline
+34 & 0x22 & 000010 & MOV  & A & B \\ \hline
+35 & 0x23 & 000011 & MOV  & A & B \\ \hline
+36 & 0x24 & 000100 & MOV  & A & B \\ \hline
+37 & 0x25 & 000101 & MOV  & A & B \\ \hline
+38 & 0x26 & 000110 & MOV  & A & B \\ \hline
+39 & 0x27 & 000111 & MOV  & A & B \\ \hline
+40 & 0x28 & 001000 & MOV  & A & B \\ \hline
+41 & 0x29 & 001001 & MOV  & A & B \\ \hline
+42 & 0x2A & 001010 & MOV  & A & B \\ \hline
+43 & 0x2B & 001011 & MOV  & A & B \\ \hline
+44 & 0x2C & 001100 & MOV  & A & B \\ \hline
+45 & 0x2D & 001101 & MOV  & A & B \\ \hline
+46 & 0x2E & 001110 & MOV  & A & B \\ \hline
+47 & 0x2F & 001111 & MOV  & A & B \\ \hline
+48 & 0x30 & 000000 & MOV  & A & B \\ \hline
+49 & 0x31 & 000001 & MOV  & A & B \\ \hline
+50 & 0x32 & 000010 & MOV  & A & B \\ \hline
+51 & 0x33 & 000011 & MOV  & A & B \\ \hline
+52 & 0x34 & 000100 & MOV  & A & B \\ \hline
+53 & 0x35 & 000101 & MOV  & A & B \\ \hline
+54 & 0x36 & 000110 & MOV  & A & B \\ \hline
+55 & 0x37 & 000111 & MOV  & A & B \\ \hline
+56 & 0x38 & 001000 & MOV  & A & B \\ \hline
+57 & 0x39 & 001001 & MOV  & A & B \\ \hline
+58 & 0x3A & 001010 & MOV  & A & B \\ \hline
+59 & 0x3B & 001011 & MOV  & A & B \\ \hline
+60 & 0x3C & 001100 & MOV  & A & B \\ \hline
+61 & 0x3D & 001101 & MOV  & A & B \\ \hline
+62 & 0x3E & 001110 & MOV  & A & B \\ \hline
+63 & 0x3F & 001111 & MOV  & A & B \\ \hline
+\end{tabular}
+\end{table}
 
 \chapter{Simplified Mnemonics}
 
