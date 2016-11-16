@@ -3,7 +3,9 @@
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage[table]{xcolor}
-%\usepackage{hhline}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{cleveref}
 
 \begin{document}
 % Title
@@ -90,27 +92,29 @@ Background registers can only accessed with the instructions BSTR and BLD.
 \hiderowcolors
 \textbf{ID}  & \textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
 \showrowcolors
-0x0 & N/A & Reserved                  & 8  \\
-0x1 & N/A & Reserved                  & 8  \\
-0x2 & N/A & Reserved                  & 8  \\
-0x3 & N/A & Reserved                  & 8  \\
-0x4 & N/A & Reserved                  & 8  \\
-0x5 & N/A & Reserved                  & 8  \\
-0x6 & N/A & Reserved                  & 8  \\
-0x7 & N/A & Reserved                  & 8  \\
+0x0 & n/a & Reserved                  & 8  \\
+0x1 & n/a & Reserved                  & 8  \\
+0x2 & n/a & Reserved                  & 8  \\
+0x3 & n/a & Reserved                  & 8  \\
+0x4 & n/a & Reserved                  & 8  \\
+0x5 & n/a & Reserved                  & 8  \\
+0x6 & n/a & Reserved                  & 8  \\
+0x7 & n/a & Reserved                  & 8  \\
 0x8 & bpc & Program counter backup    & 16 \\
 0x9 & bsf & Segments and flags backup & 16 \\
 0xA & ipc & Interrupt program counter & 16 \\
 0xB & is  & Interrupt segments        & 16 \\
-0xC & N/A & Reserved                  & 16 \\
-0xD & N/A & Reserved                  & 16 \\
-0xE & N/A & Reserved                  & 16 \\
-0xF & N/A & Reserved                  & 16 \\
+0xC & n/a & Reserved                  & 16 \\
+0xD & n/a & Reserved                  & 16 \\
+0xE & n/a & Reserved                  & 16 \\
+0xF & n/a & Reserved                  & 16 \\
 \end{tabular}
 \end{table}
 \subsection{Backup Registers}
-The backup registers are used to backup the state of the CPU. The foreground registers, segment registers and flags register all have their own backup register. However, most backup register aren't background registers. Only the Program counter, the segment registers and t 
+The backup registers are used to backup the state of the CPU. The foreground registers, segment registers and flags register all have their own backup register. However, most backup register aren't background registers. Only the segment registers, program counter register and flags register have directly accessable backup registers. Note that both segment registers and the flag register share one 16-bit backup register.
+For more information about the usage of the backup registers see: \autoref{sec:State Preservation}, State Preservation
 \subsection{Interrupt Registers}
+The Interrupt registers hold the new state the CPU should jump to when an interrupt is triggered. 
 \section{Indirect Registers}
 \subsection{Flags Register}
 \subsection{Section Registers}
@@ -154,6 +158,7 @@ The backup registers are used to backup the state of the CPU. The foreground reg
 \subsection{Internal Interrupt Mask}
 \subsection{Programmable Interrupt Controller (PIC)}
 \section{State Preservation}
+\label{sec:State Preservation}
 \subsection{Backup}
 \subsection{Full Restore}
 \subsection{Partial Restore}
@@ -205,9 +210,9 @@ The backup registers are used to backup the state of the CPU. The foreground reg
 14 & 0x0E & 001110 & MOV   & W?    & R?  \\
 15 & 0x0F & 001111 & MOV   & W?    & R?  \\
 16 & 0x10 & 010000 & MOV   & W     & R   \\
-17 & 0x11 & 010001 & N/A   & N/A   & N/A \\
+17 & 0x11 & 010001 & n/a   & n/a   & n/a \\
 18 & 0x12 & 010010 & WRI   & \_    & R   \\
-19 & 0x13 & 010011 & N/A   & N/A   & N/A \\
+19 & 0x13 & 010011 & n/a   & n/a   & n/a \\
 20 & 0x14 & 010100 & STRB  & O     & R   \\
 21 & 0x15 & 010101 & LDB   & W     & O   \\
 22 & 0x16 & 010110 & OUT   & O     & R   \\
