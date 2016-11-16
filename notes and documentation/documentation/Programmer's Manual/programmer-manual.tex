@@ -5,7 +5,7 @@
 \usepackage[table]{xcolor}
 \usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
-\usepackage{cleveref}
+%\usepackage{cleveref}
 
 \begin{document}
 % Title
@@ -111,12 +111,15 @@ Background registers can only accessed with the instructions BSTR and BLD.
 \end{tabular}
 \end{table}
 \subsection{Backup Registers}
-The backup registers are used to backup the state of the CPU. The foreground registers, segment registers and flags register all have their own backup register. However, most backup register aren't background registers. Only the segment registers, program counter register and flags register have directly accessable backup registers. Note that both segment registers and the flag register share one 16-bit backup register.
-For more information about the usage of the backup registers see: \autoref{sec:State Preservation}, State Preservation
+The backup registers are used to backup the state of the CPU (see \autoref{sec:State Preservation}). The foreground registers, segment registers and flags register all have their own backup register. However, most backup register aren't background registers. Only the segment registers, program counter register and flags register have directly accessable backup registers. Note that both segment registers and the flag register share one 16-bit backup register.
+%TODO: add bit layout for bsf
 \subsection{Interrupt Registers}
-The Interrupt registers hold the new state the CPU should jump to when an interrupt is triggered. 
+The Interrupt registers hold the new state the CPU should jump to when an interrupt is triggered (see \autoref{ch:Interrupts}). Only the segement registers and the program counter have an interrupt register.
+%TODO: add bit layout for is
 \section{Indirect Registers}
+Indirect registers are registers that software can't directly read nor write to with any instruction. All the backup registers that aren't background registers fall under this catogory. All the indirect registers can only be written to and read from via the state preservation system (see \autoref{sec:State Preservation}).
 \subsection{Flags Register}
+The flags register holds multiple flags. These flags are
 \subsection{Section Registers}
 \section{Output Registers}
 
@@ -153,6 +156,7 @@ The Interrupt registers hold the new state the CPU should jump to when an interr
 \section{Changing Segments}
 
 \chapter{Interrupts}
+\label{ch:Interrupts}
 \section{Interrupt Enabling/Disabling}
 \subsection{Interrupt Enabled Flag}
 \subsection{Internal Interrupt Mask}
