@@ -5,7 +5,6 @@
 \usepackage[table]{xcolor}
 \usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
-%\usepackage{cleveref}
 
 \begin{document}
 % Title
@@ -22,6 +21,10 @@
 \frontmatter
 \setcounter{tocdepth}{2}
 \tableofcontents
+\cleardoublepage
+\listoffigures
+\cleardoublepage
+\listoftables
 \cleardoublepage
 
 \chapter{About This Manual}
@@ -51,7 +54,7 @@ The foreground registers are the registers all regular instructions can read fro
 \begin{table}[h]
 \centering
 \caption{List of Foreground Registers}
-\label{foreground-registers-list}
+\label{tab:List of Foreground Registers}
 \begin{tabular}{cclc}
 \hiderowcolors
 \textbf{ID}  & \textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
@@ -87,7 +90,7 @@ Background registers can only accessed with the instructions BSTR and BLD.
 \begin{table}[h]
 \centering
 \caption{List of Background Registers}
-\label{background-registers-list}
+\label{tab:List of Background Registers}
 \begin{tabular}{cclc}
 \hiderowcolors
 \textbf{ID}  & \textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
@@ -119,7 +122,24 @@ The Interrupt registers hold the new state the CPU should jump to when an interr
 \section{Indirect Registers}
 Indirect registers are registers that software can't directly read nor write to with any instruction. All the backup registers that aren't background registers fall under this catogory. All the indirect registers can only be written to and read from via the state preservation system (see \autoref{sec:State Preservation}).
 \subsection{Flags Register}
-The flags register holds multiple flags. These flags are
+The flags register holds multiple flags (see \autoref{tab:List of Flags}). There are two types of flags: status flags and control flags. Status flags give software extra information about the last computation made, while control flags control how the cpu behaves. There is only one control flag in the [insert name here] processor, the interrupts enabled flag. If this flag is set to zero interrupt requests will be ignored (see \autoref{sec:Interrupt Enabling/Disabling})
+\begin{table}[h]
+\centering
+\caption{List of Flags}
+\label{tab:List of Flags}
+\begin{tabular}{cllc}
+\hiderowcolors
+\textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Type of flag} & \textbf{Length in bits} \\ \hline
+\showrowcolors
+Z & Zero flag               & Status flag  & 1 \\
+S & Sign flag               & Status flag  & 1 \\
+P & Parity flag             & Status flag  & 1 \\
+O & Overflow flag           & Status flag  & 1 \\
+C & Carry flag              & Status flag  & 1 \\
+I & Interrupts enabled flag & Control flag & 1 \\
+
+\end{tabular}
+\end{table}
 \subsection{Section Registers}
 \section{Output Registers}
 
@@ -158,6 +178,7 @@ The flags register holds multiple flags. These flags are
 \chapter{Interrupts}
 \label{ch:Interrupts}
 \section{Interrupt Enabling/Disabling}
+\label{sec:Interrupt Enabling/Disabling}
 \subsection{Interrupt Enabled Flag}
 \subsection{Internal Interrupt Mask}
 \subsection{Programmable Interrupt Controller (PIC)}
