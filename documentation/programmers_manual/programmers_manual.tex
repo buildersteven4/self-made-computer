@@ -122,7 +122,14 @@ The Interrupt registers hold the new state the CPU should jump to when an interr
 \section{Indirect Registers}
 Indirect registers are registers that software can't directly read nor write to with any instruction. All the backup registers that aren't background registers fall under this catogory. All the indirect registers can only be written to and read from via the state preservation system (see \autoref{sec:State Preservation}).
 \subsection{Flags Register}
-The flags register holds multiple flags (see \autoref{tab:List of Flags}). There are two types of flags: status flags and control flags. Status flags give software extra information about the last computation made, while control flags control how the cpu behaves. There is only one control flag in the [insert name here] processor, the interrupts enabled flag. If this flag is set to zero interrupt requests will be ignored (see \autoref{sec:Interrupt Enabling/Disabling})
+The flags register holds multiple flags (see \autoref{tab:List of Flags}). There are two types of flags: status flags and control flags. Status flags give software extra information about the last computation made, while control flags control how the cpu behaves. There is only one control flag in the [insert name here] processor, the interrupts enabled flag. If this flag is set to zero interrupt requests will be ignored (see \autoref{sec:Interrupt Enabling/Disabling}).
+\begin{description}
+\item[Zero flag]: If the result of the last computation is equal to zero this flag will be set, otherwise it will be cleared.
+\item[Sign flag]: If the most significant  bit of the result of the last computation is set this flag will be set, otherwise it will be cleared.
+\item[Parity flag]: If the least significant  bit of the result of the last computation is clear this flag will be set, otherwise it will be cleared.
+\item[Overflow flag]: If the signed two's-complement result of the last computation is too large to fit in operand A (see \autoref{sec:Operand Conventions}) this flag will be set, otherwise it will be cleared. (Not all computational instructions change this flag)
+\item[Carry flag]: If the unsigned result of the last computation is too large to fit in operand A (see \autoref{sec:Operand Conventions}) this flag will be set, otherwise it will be cleared. (Not all computational instructions change this flag)
+\end{description}
 \begin{table}[h]
 \centering
 \caption{List of Flags}
@@ -137,7 +144,6 @@ P & Parity flag             & Status flag  & 1 \\
 O & Overflow flag           & Status flag  & 1 \\
 C & Carry flag              & Status flag  & 1 \\
 I & Interrupts enabled flag & Control flag & 1 \\
-
 \end{tabular}
 \end{table}
 \subsection{Section Registers}
@@ -145,6 +151,7 @@ I & Interrupts enabled flag & Control flag & 1 \\
 
 \chapter{Operand Conventions and Addressing Modes}
 \section{Operand Conventions}
+\label{sec:Operand Conventions}
 \subsection{Bit and Byte Ordering}
 \subsection{Aligned and Misaligned Memory Access}
 \section{Addressing Modes}
