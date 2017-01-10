@@ -15,7 +15,7 @@
 \cleardoublepage
 
 \setlength\arrayrulewidth{1pt}
-\rowcolors{2}{}{gray!20}
+\rowcolors{2}{}{gray!15}
 
 % Front Matter 
 \frontmatter
@@ -146,14 +146,49 @@ C & Carry flag              & Status flag  & 1 \\
 I & Interrupts enabled flag & Control flag & 1 \\
 \end{tabular}
 \end{table}
-\subsection{Section Registers}
+\subsection{Segment Registers}
+The segment registers (see \autoref{tab:List of Segment Registers}) hold the index of the segments currently used (see \autoref{ch:Memory Management}).
+\begin{table}[h]
+\centering
+\caption{List of Segment Registers}
+\label{tab:List of Segment Registers}
+\begin{tabular}{clc}
+\hiderowcolors
+\textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
+\showrowcolors
+CS & Code segment index & 5 \\
+DS & Data segment index & 5 \\
+\end{tabular}
+\end{table}
 \section{Output Registers}
+The output registers (see \autoref{tab:List of Output Registers}) hold information that is sent to the pheripherals (see \autoref{ch:I/O Conventions})
+\begin{table}[h]
+\centering
+\caption{List of Output Registers}
+\label{tab:List of Output Registers}
+\begin{tabular}{clc}
+\hiderowcolors
+\textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
+\showrowcolors
+AO & The first output register   & 16 \\
+BO & The second output register  & 16 \\
+CO & The third output register   & 16 \\
+DO & The fourth output register  & 16 \\
+EO & The fifth output register   & 16 \\
+FO & The sixth output register   & 16 \\
+GO & The seventh output register & 16 \\
+HO & The eigth output register   & 16 \\
+\end{tabular}
+\end{table}
 
 \chapter{Operand Conventions and Addressing Modes}
+This chapter describes
+
 \section{Operand Conventions}
 \label{sec:Operand Conventions}
 \subsection{Bit and Byte Ordering}
 \subsection{Aligned and Misaligned Memory Access}
+
 \section{Addressing Modes}
 \subsection{Not From Memory}
 \subsubsection{Register Direct}
@@ -164,16 +199,21 @@ I & Interrupts enabled flag & Control flag & 1 \\
 \subsubsection{Base Plus Displacement}
 
 \chapter{Instruction Set Summary}
+This chapter gives a summary on the instruction set of the [insert name here] processor. It will describe the types of instructions and the binary layout of the instructions.
 \section{Instruction Types}
+The instructions can be seperated in five types. Two of these types are not meant to be used. 
 \subsection{Move Instructions}
 \subsection{Arithimic Instructions}
 \subsection{Control Instructions}
 \subsection{Reserved Instructions}
 \subsection{Artifact Instructions}
+Artifact Instructions are instructions with defined behaviour, but aren't considererd a permanent part of the [insert name here] processor family. These instructions tend to 
+
 \section{Instruction Format}
 \subsection{exceptions}
 
 \chapter{Memory Management}
+\label{ch:Memory Management}
 \section{Segments}
 \subsection{Base}
 \subsection{Limit}
@@ -200,6 +240,7 @@ I & Interrupts enabled flag & Control flag & 1 \\
 \subsection{Switch Context}
 
 \chapter{I/O Conventions}
+\label{ch:I/O Conventions}
 \section{Reading Input}
 \section{Writing Output}
 \subsection{Problem with Interrupts}
@@ -306,3 +347,4 @@ I & Interrupts enabled flag & Control flag & 1 \\
 \section{Segements and Out Of Bounds Exception}
 
 \end{document}
+
