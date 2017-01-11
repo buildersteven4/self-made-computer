@@ -10,16 +10,16 @@
 \usepackage[hidelinks]{hyperref}
 
 \newcommand{\instruction}[6]{
-\section*{#1} % The name of the instrunction
+\section{#1} % The name of the instrunction
 Opcode: #2
-\subsection{Usages}
-#3
-\subsection{Description}
+\subsection*{Usages}
+\ifthenelse{\equal{#3}{}}{#1 a b}{#3}
+\subsection*{Description}
 #4
-\subsection{Operation}
+\subsection*{Operation}
 #5
-\subsection{Flags Affected}
-#6
+\subsection*{Flags Affected}
+\ifthenelse{\equal{#6}{}}{none}{#6}
 \clearpage
 }
 
@@ -264,6 +264,7 @@ Artifact Instructions are instructions with defined behaviour, but aren't consid
 
 \chapter{Instruction Set}
 \clearpage
+
 \instruction{MOVZ or MOV=}{0x00}{
 MOVZ a b \\
 MOV= a b
@@ -277,7 +278,7 @@ Writes B to A if the zero flag is set. Since the zero flag is always set after a
 \end{algorithmic}
 alternative pseudocode:
 \begin{algorithmic}
-\If {$y = 0$} \Comment Where y is the result of a previous calculation
+\If {$x = y$} \Comment Where x and y were the operands of a previous calculation
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
@@ -296,15 +297,94 @@ Writes B to A if the zero flag is clear. Since the zero flag is always clear aft
 \end{algorithmic}
 alternative pseudocode:
 \begin{algorithmic}
-\If {$y \not= 0$} \Comment Where y is the result of a previous calculation
+\If {$x \not= y$} \Comment Where x and y were the operands of a previous calculation
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
 }{none}
 
-\section*{0x02: MOVS}
-\section*{0x03: MOVNS}
-\section*{...}
+\instruction{MOVS}{0x02}{
+MOVS a b
+}{
+Writes B to A if the sign flag is set.
+}{
+\begin{algorithmic}
+\If {$S$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
+\instruction{MOVNS}{0x03}{
+MOVNS a b
+}{
+Writes B to A if the sign flag is clear.
+}{
+\begin{algorithmic}
+\If {$\neg S$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
+\instruction{MOVP}{0x04}{
+MOVP a b
+}{
+Writes B to A if the parity flag is set.
+}{
+\begin{algorithmic}
+\If {$P$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
+\instruction{MOVNP}{0x05}{
+MOVNP a b
+}{
+Writes B to A if the parity flag is clear.
+}{
+\begin{algorithmic}
+\If {$\neg P$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
+\instruction{MOVO}{0x06}{
+MOVO a b
+}{
+Writes B to A if the overflow flag is set.
+}{
+\begin{algorithmic}
+\If {$O$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
+\instruction{MOVNO}{0x07}{
+MOVNO a b
+}{
+Writes B to A if the overflow flag is clear.
+}{
+\begin{algorithmic}
+\If {$\neg O$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
+\instruction{MOVNO}{0x07}{}{
+Writes B to A if the overflow flag is clear.
+}{
+\begin{algorithmic}
+\If {$\neg O$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
 
 % Appendix
 \appendix
