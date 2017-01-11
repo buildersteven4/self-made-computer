@@ -1,10 +1,27 @@
 \documentclass[oneside, a4paper]{memoir}
 
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{algpseudocode}
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage[table]{xcolor}
 \usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
+
+\newcommand{\instruction}[6]{
+\section*{#1} % The name of the instrunction
+Opcode: #2
+\subsection{Usages}
+#3
+\subsection{Description}
+#4
+\subsection{Operation}
+#5
+\subsection{Flags Affected}
+#6
+\clearpage
+}
 
 \begin{document}
 % Title
@@ -246,8 +263,45 @@ Artifact Instructions are instructions with defined behaviour, but aren't consid
 \subsection{Problem with Interrupts}
 
 \chapter{Instruction Set}
-\section*{0x00: MOVZ}
-\section*{0x01: MOVNZ}
+\clearpage
+\instruction{MOVZ or MOV=}{0x00}{
+MOVZ a b \\
+MOV= a b
+}{
+Writes B to A if the zero flag is set. Since the zero flag is always set after a comparison or test of two equal operators this instruction can also be used to only write A to B if the last comparison or test was equal. The alternative Memnonic MOV= was provided for this use.
+}{
+\begin{algorithmic}
+\If {$Z$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$y = 0$} \Comment Where y is the result of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
+\instruction{MOVNZ or MOV!=}{0x01}{
+MOVNZ a b \\
+MOV!= a b
+}{
+Writes B to A if the zero flag is clear. Since the zero flag is always clear after a comparison or test of two unequal operators this instruction can also be used to only write A to B if the last comparison or test was unequal. The alternative Memnonic MOV= was provided for this use.
+}{
+\begin{algorithmic}
+\If {$\neg Z$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$y \not= 0$} \Comment Where y is the result of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{none}
+
 \section*{0x02: MOVS}
 \section*{0x03: MOVNS}
 \section*{...}
@@ -258,7 +312,7 @@ Artifact Instructions are instructions with defined behaviour, but aren't consid
 \chapter{Instruction Set Listings}
 
 \begin{center}
-\begin{longtable}{cccccc}
+\begin{longtable}{ccclcc}
 \caption{List of instructions sorted by opcode} 
 \label{opcode_sorted_instructions_list} \\
 \hiderowcolors
@@ -266,70 +320,70 @@ Artifact Instructions are instructions with defined behaviour, but aren't consid
 \textbf{Decimal} & \textbf{Hex} & \textbf{Binary} &  &  &  \\ \hline 
 \showrowcolors 
 \endhead
-0  & 0x00 & 000000 & MOV   & W?    & R?  \\
-1  & 0x01 & 000001 & MOV   & W?    & R?  \\
-2  & 0x02 & 000010 & MOV   & W?    & R?  \\
-3  & 0x03 & 000011 & MOV   & W?    & R?  \\
-4  & 0x04 & 000100 & MOV   & W?    & R?  \\
-5  & 0x05 & 000101 & MOV   & W?    & R?  \\
-6  & 0x06 & 000110 & MOV   & W?    & R?  \\
-7  & 0x07 & 000111 & MOV   & W?    & R?  \\
-8  & 0x08 & 001000 & MOV   & W?    & R?  \\
-9  & 0x09 & 001001 & MOV   & W?    & R?  \\
-10 & 0x0A & 001010 & MOV   & W?    & R?  \\
-11 & 0x0B & 001011 & MOV   & W?    & R?  \\
-12 & 0x0C & 001100 & MOV   & W?    & R?  \\
-13 & 0x0D & 001101 & MOV   & W?    & R?  \\
-14 & 0x0E & 001110 & MOV   & W?    & R?  \\
-15 & 0x0F & 001111 & MOV   & W?    & R?  \\
-16 & 0x10 & 010000 & MOV   & W     & R   \\
-17 & 0x11 & 010001 & n/a   & n/a   & n/a \\
-18 & 0x12 & 010010 & WRI   & \_    & R   \\
-19 & 0x13 & 010011 & n/a   & n/a   & n/a \\
-20 & 0x14 & 010100 & STRB  & O     & R   \\
-21 & 0x15 & 010101 & LDB   & W     & O   \\
-22 & 0x16 & 010110 & OUT   & O     & R   \\
-23 & 0x17 & 010111 & IN    & W     & O   \\
-24 & 0x18 & 011000 & BACK  & \_    & \_  \\
-25 & 0x19 & 011001 & FRET  & \_    & \_  \\
-26 & 0x1A & 011010 & PRET  & \_    & \_  \\
-27 & 0x1B & 011011 & FJMP  & \_    & \_  \\
-28 & 0x1C & 011100 & HLT   & \_    & \_  \\
-29 & 0x1D & 011101 & NOP   & \_    & \_  \\
-30 & 0x1E & 011110 & CMP   & R     & R   \\
-31 & 0x1F & 011111 & TEST  & R     & R   \\
-32 & 0x20 & 100000 & OR    & R\&W  & R   \\
-33 & 0x21 & 100001 & OR    & !R\&W & R   \\
-34 & 0x22 & 100010 & OR    & R\&W  & !R  \\
-35 & 0x23 & 100011 & OR    & !R\&W & !R  \\
-36 & 0x24 & 100100 & AND   & R\&W  & R   \\
-37 & 0x25 & 100101 & AND   & !R\&W & R   \\
-38 & 0x26 & 100110 & AND   & R\&W  & !R  \\
-39 & 0x27 & 100111 & AND   & !R\&W & !R  \\
-40 & 0x28 & 101000 & XOR   & R\&W  & R   \\
-41 & 0x29 & 101001 & XOR   & !R\&W & R   \\
-42 & 0x2A & 101010 & XOR   & R\&W  & !R  \\
-43 & 0x2B & 101011 & XOR   & !R\&W & !R  \\
-44 & 0x2C & 101100 & ADD   & R\&W  & R   \\
-45 & 0x2D & 101101 & ADD   & !R\&W & R   \\
-46 & 0x2E & 101110 & ADD   & R\&W  & !R  \\
-47 & 0x2F & 101111 & ADD   & !R\&W & !R  \\
-48 & 0x30 & 110000 & ADD1  & R\&W  & R   \\
-49 & 0x31 & 110001 & ADD1  & !R\&W & R   \\
-50 & 0x32 & 110010 & ADD1  & R\&W  & !R  \\
-51 & 0x33 & 110011 & ADD1  & !R\&W & !R  \\
-52 & 0x34 & 110100 & ADDC  & R\&W  & R   \\
-53 & 0x35 & 110101 & ADDC  & !R\&W & R   \\
-54 & 0x36 & 110110 & ADDC  & R\&W  & !R  \\
-55 & 0x37 & 110111 & ADDC  & !R\&W & !R  \\
-56 & 0x38 & 111000 & SHL   & W     & R   \\
-57 & 0x39 & 111001 & SHL1  & W     & R   \\
-58 & 0x3A & 111010 & RCL   & W     & R   \\
-59 & 0x3B & 111011 & ROL   & W     & R   \\
-60 & 0x3C & 111100 & SHR   & W     & R   \\
-61 & 0x3D & 111101 & SHR1  & W     & R   \\
-62 & 0x3E & 111110 & RCR   & W     & R   \\
-63 & 0x3F & 111111 & ROR   & W     & R   \\
+0  & 0x00 & 000000 & MOVZ \& MOV=    & W?    & R?  \\
+1  & 0x01 & 000001 & MOVNZ \& MOV!=  & W?    & R?  \\
+2  & 0x02 & 000010 & MOVS            & W?    & R?  \\
+3  & 0x03 & 000011 & MOVNS           & W?    & R?  \\
+4  & 0x04 & 000100 & MOVP            & W?    & R?  \\
+5  & 0x05 & 000101 & MOVNP           & W?    & R?  \\
+6  & 0x06 & 000110 & MOVO            & W?    & R?  \\
+7  & 0x07 & 000111 & MOVNO           & W?    & R?  \\
+8  & 0x08 & 001000 & MOVC  \& MOVU>  & W?    & R?  \\
+9  & 0x09 & 001001 & MOVNC \& MOVU<= & W?    & R?  \\
+10 & 0x0A & 001010 & MOVU>=          & W?    & R?  \\
+11 & 0x0B & 001011 & MOVU<           & W?    & R?  \\
+12 & 0x0C & 001100 & MOVS>           & W?    & R?  \\
+13 & 0x0D & 001101 & MOVS<=          & W?    & R?  \\
+14 & 0x0E & 001110 & MOVS<           & W?    & R?  \\
+15 & 0x0F & 001111 & MOVS>=          & W?    & R?  \\
+16 & 0x10 & 010000 & MOV             & W     & R   \\
+17 & 0x11 & 010001 & n/a             & n/a   & n/a \\
+18 & 0x12 & 010010 & WRI             & \_    & R   \\
+19 & 0x13 & 010011 & n/a             & n/a   & n/a \\
+20 & 0x14 & 010100 & STRB            & O     & R   \\
+21 & 0x15 & 010101 & LDB             & W     & O   \\
+22 & 0x16 & 010110 & OUT             & O     & R   \\
+23 & 0x17 & 010111 & IN              & W     & O   \\
+24 & 0x18 & 011000 & BACK            & \_    & \_  \\
+25 & 0x19 & 011001 & FRET            & \_    & \_  \\
+26 & 0x1A & 011010 & PRET            & \_    & \_  \\
+27 & 0x1B & 011011 & FJMP            & \_    & \_  \\
+28 & 0x1C & 011100 & HLT             & \_    & \_  \\
+29 & 0x1D & 011101 & NOP             & \_    & \_  \\
+30 & 0x1E & 011110 & CMP             & R     & R   \\
+31 & 0x1F & 011111 & TEST            & R     & R   \\
+32 & 0x20 & 100000 & OR              & R\&W  & R   \\
+33 & 0x21 & 100001 & OR              & !R\&W & R   \\
+34 & 0x22 & 100010 & OR              & R\&W  & !R  \\
+35 & 0x23 & 100011 & OR              & !R\&W & !R  \\
+36 & 0x24 & 100100 & AND             & R\&W  & R   \\
+37 & 0x25 & 100101 & AND             & !R\&W & R   \\
+38 & 0x26 & 100110 & AND             & R\&W  & !R  \\
+39 & 0x27 & 100111 & AND             & !R\&W & !R  \\
+40 & 0x28 & 101000 & XOR             & R\&W  & R   \\
+41 & 0x29 & 101001 & XOR             & !R\&W & R   \\
+42 & 0x2A & 101010 & XOR             & R\&W  & !R  \\
+43 & 0x2B & 101011 & XOR             & !R\&W & !R  \\
+44 & 0x2C & 101100 & ADD             & R\&W  & R   \\
+45 & 0x2D & 101101 & ADD             & !R\&W & R   \\
+46 & 0x2E & 101110 & ADD             & R\&W  & !R  \\
+47 & 0x2F & 101111 & ADD             & !R\&W & !R  \\
+48 & 0x30 & 110000 & ADD1            & R\&W  & R   \\
+49 & 0x31 & 110001 & ADD1            & !R\&W & R   \\
+50 & 0x32 & 110010 & ADD1            & R\&W  & !R  \\
+51 & 0x33 & 110011 & ADD1            & !R\&W & !R  \\
+52 & 0x34 & 110100 & ADDC            & R\&W  & R   \\
+53 & 0x35 & 110101 & ADDC            & !R\&W & R   \\
+54 & 0x36 & 110110 & ADDC            & R\&W  & !R  \\
+55 & 0x37 & 110111 & ADDC            & !R\&W & !R  \\
+56 & 0x38 & 111000 & SHL             & W     & R   \\
+57 & 0x39 & 111001 & SHL1            & W     & R   \\
+58 & 0x3A & 111010 & RCL             & W     & R   \\
+59 & 0x3B & 111011 & ROL             & W     & R   \\
+60 & 0x3C & 111100 & SHR             & W     & R   \\
+61 & 0x3D & 111101 & SHR1            & W     & R   \\
+62 & 0x3E & 111110 & RCR             & W     & R   \\
+63 & 0x3F & 111111 & ROR             & W     & R   \\
 \end{longtable}
 \end{center}
 
