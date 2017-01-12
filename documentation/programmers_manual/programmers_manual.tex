@@ -10,10 +10,10 @@
 \usepackage[hidelinks]{hyperref}
 
 \newcommand{\instruction}[6]{
-\section{#1} % The name of the instrunction
-Opcode: #2
+\section{#1}
+\section*{#2}
 \subsection*{Usages}
-\ifthenelse{\equal{#3}{}}{#1 a b}{#3}
+#3
 \subsection*{Description}
 #4
 \subsection*{Operation}
@@ -265,11 +265,12 @@ Artifact Instructions are instructions with defined behaviour, but aren't consid
 \chapter{Instruction Set}
 \clearpage
 
-\instruction{MOVZ or MOV=}{0x00}{
-MOVZ a b \\
-MOV= a b
+% MOVZ
+\instruction{MOVZ / MOV=}{\underline{Mov}e if \underline{z}ero / \underline{Mov}e if equal}{
+0x00: MOVZ a b \\
+0x00: MOV= a b
 }{
-Writes B to A if the zero flag is set. Since the zero flag is always set after a comparison or test of two equal operators this instruction can also be used to only write A to B if the last comparison or test was equal. The alternative Memnonic MOV= was provided for this use.
+Writes B to A if the zero flag is set. This instruction can also be used to only write B to A if, in the last comparison, B was equal to A. The alternative Memnonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
 \begin{algorithmic}
 \If {$Z$}
@@ -278,17 +279,18 @@ Writes B to A if the zero flag is set. Since the zero flag is always set after a
 \end{algorithmic}
 alternative pseudocode:
 \begin{algorithmic}
-\If {$x = y$} \Comment Where x and y were the operands of a previous calculation
+\If {$b_{previous} = a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVNZ or MOV!=}{0x01}{
-MOVNZ a b \\
-MOV!= a b
+% MOVNZ
+\instruction{MOVNZ / MOV!=}{\underline{Mov}e if \underline{n}ot \underline{z}ero / \underline{Mov}e if not equal}{
+0x01: MOVNZ a b \\
+0x01: MOV!= a b
 }{
-Writes B to A if the zero flag is clear. Since the zero flag is always clear after a comparison or test of two unequal operators this instruction can also be used to only write A to B if the last comparison or test was unequal. The alternative Memnonic MOV= was provided for this use.
+Writes B to A if the zero flag is clear. This instruction can also be used to only write B to A if, in the last comparison, B was unequal to A. The alternative Memnonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
 \begin{algorithmic}
 \If {$\neg Z$}
@@ -297,14 +299,15 @@ Writes B to A if the zero flag is clear. Since the zero flag is always clear aft
 \end{algorithmic}
 alternative pseudocode:
 \begin{algorithmic}
-\If {$x \not= y$} \Comment Where x and y were the operands of a previous calculation
+\If {$b_{previous} \not= a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVS}{0x02}{
-MOVS a b
+% MOVS
+\instruction{MOVS}{\underline{Mov}e if \underline{s}ign}{
+0x02: MOVS a b
 }{
 Writes B to A if the sign flag is set.
 }{
@@ -313,10 +316,11 @@ Writes B to A if the sign flag is set.
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVNS}{0x03}{
-MOVNS a b
+% MOVNS
+\instruction{MOVNS}{\underline{Mov}e if \underline{n}ot \underline{s}ign}{
+0x03: MOVNS a b
 }{
 Writes B to A if the sign flag is clear.
 }{
@@ -325,10 +329,11 @@ Writes B to A if the sign flag is clear.
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVP}{0x04}{
-MOVP a b
+% MOVP
+\instruction{MOVP}{\underline{Mov}e if \underline{p}arity}{
+0x04: MOVP a b
 }{
 Writes B to A if the parity flag is set.
 }{
@@ -337,10 +342,11 @@ Writes B to A if the parity flag is set.
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVNP}{0x05}{
-MOVNP a b
+% MOVNP
+\instruction{MOVNP}{\underline{Mov}e if \underline{n}ot \underline{p}arity}{
+0x05: MOVNP a b
 }{
 Writes B to A if the parity flag is clear.
 }{
@@ -349,10 +355,11 @@ Writes B to A if the parity flag is clear.
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVO}{0x06}{
-MOVO a b
+% MOVO
+\instruction{MOVO}{\underline{Mov}e if \underline{o}verflow}{
+0x06: MOVO a b
 }{
 Writes B to A if the overflow flag is set.
 }{
@@ -361,10 +368,11 @@ Writes B to A if the overflow flag is set.
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVNO}{0x07}{
-MOVNO a b
+% MOVNO
+\instruction{MOVNO}{\underline{Mov}e if \underline{n}o \underline{o}verflow}{
+0x07: MOVNO a b
 }{
 Writes B to A if the overflow flag is clear.
 }{
@@ -373,15 +381,238 @@ Writes B to A if the overflow flag is clear.
     \State $a\gets b$
 \EndIf
 \end{algorithmic}
-}{none}
+}{}
 
-\instruction{MOVNO}{0x07}{}{
-Writes B to A if the overflow flag is clear.
+% MOVC
+\instruction{MOVC / MOVU>}{\underline{Mov}e if \underline{c}arry / \underline{Mov}e if \underline{u}nsigned greater}{
+0x08: MOVC a b \\
+0x08: MOVU> a b
+}{
+Writes B to A if the carry flag is set. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was greater than A. The alternative Memnonic MOVU> was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
 \begin{algorithmic}
-\If {$\neg O$}
+\If {$C$}
     \State $a\gets b$
 \EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} > a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+% MOVNC
+\instruction{MOVNC / MOVU<=}{\underline{Mov}e if \underline{n}o \underline{c}arry / \underline{Mov}e if \underline{u}nsigned smaller or equal}{
+0x09: MOVNC a b \\
+0x09: MOVU<= a b
+}{
+Writes B to A if the carry flag is clear. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was smaller than or equal to A. The alternative Memnonic MOVU<= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+}{
+\begin{algorithmic}
+\If {$\neg C$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} \leq a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+% MOVU>=
+\instruction{MOVU>=}{\underline{Mov}e if \underline{u}nsigned greater or equal}{
+0x0A: MOVU>= a b
+}{
+Writes B to A if, in the last comparison of unsigned numbers, B was greater than or equal to A. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+}{
+\begin{algorithmic}
+\If {$C \vee Z$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} \geq a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+% MOVU<
+\instruction{MOVU<}{\underline{Mov}e if \underline{u}nsigned smaller}{
+0x0B: MOVU< a b
+}{
+Writes B to A if, in the last comparison of unsigned numbers, B was smaller than A. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+}{
+\begin{algorithmic}
+\If {$\neg (C \vee Z)$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} < a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+
+
+% MOVS>
+\instruction{MOVS>}{\underline{Mov}e if \underline{s}igned greater}{
+0x0C: MOVS> a b
+}{
+Writes B to A if, in the last comparison of signed numbers, B was greater than A. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+}{
+\begin{algorithmic}
+\If {$\neg Z \wedge (O \oplus S)$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} > a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+% MOVS<=
+\instruction{MOVS<=}{\underline{Mov}e if \underline{s}igned smaller or equal}{
+0x0D: MOVS<= a b
+}{
+Writes B to A if, in the last comparison of signed numbers, B was smaller than or equal to A. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+}{
+\begin{algorithmic}
+\If {$Z \vee \neg(O \oplus S)$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} \leq a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+% MOVS<
+\instruction{MOVS<}{\underline{Mov}e if \underline{s}igned smaller}{
+0x0E: MOVS< a b
+}{
+Writes B to A if, in the last comparison of signed numbers, B was smaller than A. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+}{
+\begin{algorithmic}
+\If {$O \oplus S$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} < a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+% MOVS>=
+\instruction{MOVS>=}{\underline{Mov}e if \underline{s}igned greater or equal}{
+0x0F: MOVS>= a b
+}{
+Writes B to A if, in the last comparison of signed numbers, B was greater than or equal to A. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+}{
+\begin{algorithmic}
+\If {$\neg O \oplus S$}
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+alternative pseudocode:
+\begin{algorithmic}
+\If {$b_{previous} \geq a_{previous}$} \Comment Where $b_{previous}$ and $a_{previous}$ are the operands of a previous calculation
+    \State $a\gets b$
+\EndIf
+\end{algorithmic}
+}{}
+
+% MOV
+\instruction{MOV}{\underline{Mov}e}{
+0x10: MOV a b
+}{
+Writes B to A unconditionally.
+}{
+\begin{algorithmic}
+\State $a\gets b$
+\end{algorithmic}
+}{}
+
+% WRI
+\instruction{WRI}{\underline{Wr}ite \underline{i}nterupts enabled}{
+0x12: WRI \_ b
+}{
+Writes the least significant bit of B to the interrupts enabled flag. This allows you to enable and disable interrupts in a single instruction.
+}{
+\begin{algorithmic}
+\State $IF \gets b \mathrel{\&} 0001_{16}$ \Comment Everything but the least significant bit is omitted
+\end{algorithmic}
+}{}
+
+% ISTR
+\instruction{ISTR}{\underline{I}nternal \underline{st}o\underline{r}e}{
+0x14: ISTR a b
+}{
+Writes B to internal register A.
+}{
+\begin{algorithmic}
+\State $a\gets b$ \Comment Where $a$ is an internal register
+\end{algorithmic}
+}{}
+
+% ILD
+\instruction{ILD}{\underline{I}nternal \underline{l}oa\underline{d}}{
+0x15: ILD a b
+}{
+Writes internal register B to A.
+}{
+\begin{algorithmic}
+\State $a\gets b$ \Comment Where $b$ is an internal register
+\end{algorithmic}
+}{}
+
+% OUT
+\instruction{OUT}{\underline{Out}put}{
+0x16: OUT a b
+}{
+Writes B to output register A.
+}{
+\begin{algorithmic}
+\State $a\gets b$ \Comment Where $a$ is an output register
+\end{algorithmic}
+}{}
+
+% IN
+\instruction{IN}{\underline{In}put}{
+0x17: IN a b
+}{
+Request input from pheriperal B and write the returned input to A.
+}{
+\begin{algorithmic}
+\State $a\gets \Call{RequestInputFrom}{b}$
+\end{algorithmic}
+}{}
+
+% 
+\instruction{}{\underline{}}{
+0x:  a b
+}{
+
+}{
+\begin{algorithmic}
+\State $a\gets b$
 \end{algorithmic}
 }{}
 
