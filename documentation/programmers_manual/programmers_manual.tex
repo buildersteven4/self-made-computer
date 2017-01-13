@@ -557,9 +557,9 @@ Writes B to A unconditionally.
 Writes the least significant bit of B to the interrupts enabled flag. This allows you to enable and disable interrupts in a single instruction.
 }{
 \begin{algorithmic}
-\State $IF \gets b \mathrel{\&} 0001_{16}$ \Comment Everything but the least significant bit is omitted
+\State $I \gets b \mathrel{\&} 0001_{16}$ \Comment Everything but the least significant bit is omitted
 \end{algorithmic}
-}{}
+}{I}
 
 % ISTR
 \instruction{ISTR}{\underline{I}nternal \underline{st}o\underline{r}e}{
@@ -604,6 +604,142 @@ Request input from pheriperal B and write the returned input to A.
 \State $a\gets \Call{RequestInputFrom}{b}$
 \end{algorithmic}
 }{}
+
+% BACK
+\instruction{BACK}{\underline{Back}up}{
+0x18: BACK \_ \_
+}{
+Backups all the registers that have a backup registers
+}{
+\begin{algorithmic}
+\State $bax \gets ax$
+\State $bbx \gets bx$
+\State $bcx \gets cx$
+\State $bdx \gets dx$
+\State $bex \gets ex$
+\State $btm \gets tm$
+\State $bsp \gets sp$
+\State $bpc \gets pc$
+\State $bsf \gets sf$ \Comment Backup the segment and flag registers
+\end{algorithmic}
+}{}
+
+% FRET
+\instruction{FRET}{\underline{F}ull \underline{re}s\underline{t}ore}{
+0x19: FRET \_ \_
+}{
+Restores some of the registers and marks that the there is no interrupt being handled
+}{
+\begin{algorithmic}
+\State $ax \gets bax$
+\State $bx \gets bbx$
+\State $cx \gets bcx$
+\State $dx \gets bdx$
+\State $ex \gets bex$
+\State $tm \gets btm$
+\State $sp \gets bsp$
+\State $pc \gets bpc$
+\State $sf \gets bsf$ \Comment Restore the segment and flag registers
+\State \Call{MarkInterruptEnded}{ } \Comment Unlock the internal lock that prevents interrupts
+\end{algorithmic}
+}{Z, S, P, O, C and I}
+
+% PRET
+\instruction{PRET}{\underline{P}artial \underline{re}s\underline{t}ore}{
+0x1A: PRET \_ \_
+}{
+Restores some of the registers and marks that the there is no interrupt being handled.
+}{
+\begin{algorithmic}
+\State $pc \gets bpc$
+\State $sf \gets bsf$ \Comment Restore the segment and flag registers
+\State \Call{MarkInterruptEnded}{ } \Comment Unlock the internal lock that prevents interrupts
+\end{algorithmic}
+}{Z, S, P, O, C and I}
+
+% FJMP
+\instruction{FJMP}{\underline{F}ar \underline{j}u\underline{mp}}{
+0x1B: FJMP \_ \_
+}{
+Restores some of the registers.
+}{
+\begin{algorithmic}
+\State $pc \gets bpc$
+\State $sf \gets bsf$ \Comment Restore the segment and flag registers
+\end{algorithmic}
+}{Z, S, P, O, C and I}
+
+% HLT
+\instruction{HLT}{\underline{H}a\underline{lt}}{
+0x1C: HLT \_ \_
+}{
+Halts the CPU until an external interrupt is triggered and resumes.
+}{
+\begin{algorithmic}
+\State \Call{HaltCPU}{ }
+\end{algorithmic}
+}{}
+
+% NOP
+\instruction{NOP}{\underline{N}o \underline{op}erations}{
+0x1D: NOP \_ \_
+}{
+Does nothing but delay the cpu a minimal amount of cycles. 
+}{
+\begin{algorithmic}
+\If {$false$} \Comment NOP is implemented as a do never conditional
+    \State $...$ 
+\EndIf
+\end{algorithmic}
+}{}
+
+% OR
+\instruction{OR}{Bitwise \underline{or}}{
+0x20: OR a b \\
+0x21: OR !a b \\
+0x22: OR a !b \\
+0x23: OR !a !b
+}{
+preforms bitwise logical or operation on A and B and writes the answer to A. The answer is also evaluated to update the status flags. Both operands can be One's Complement Negated (NOT'ed) before the operation in the same instruction. This is marked by the '!' before the operand. 
+}{
+\begin{algorithmic}
+\State $y\gets (!)a \mathrel{|} (!)b$
+\State $a\gets y$
+\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
+\end{algorithmic}
+}{Z, S and P}
+
+% AND
+\instruction{AND}{Bitwise \underline{and}}{
+0x24: AND a b \\
+0x25: AND !a b \\
+0x26: AND a !b \\
+0x27: AND !a !b
+}{
+preforms bitwise logical and operation on A and B and writes the answer to A. The answer is also evaluated to update the status flags. Both operands can be One's Complement Negated (NOT'ed) before the operation in the same instruction. This is marked by the '!' before the operand. 
+}{
+\begin{algorithmic}
+\State $y\gets (!)a \mathrel{\&} (!)b$
+\State $a\gets y$
+\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
+\end{algorithmic}
+}{Z, S and P}
+
+% XOR
+\instruction{XOR}{Bitwise e\underline{x}clusive \underline{or}}{
+0x28: XOR a b \\
+0x29: XOR !a b \\
+0x2A: XOR a !b \emph{(Artifact instruction)}\\
+0x2B: XOR !a !b \emph{(Artifact instruction)}
+}{
+preforms bitwise logical exclusive or operation on A and B and writes the answer to A. The answer is also evaluated to update the status flags. Both operands can be One's Complement Negated (NOT'ed) before the operation in the same instruction. This is marked by the '!' before the operand. However because of the logical properties of exclusive or, "XOR !a !b" and "XOR a !b" behave exactly the same as "XOR a b" and "XOR !a b" respectively. Thus instruction "XOR !a !b" and "XOR a !b" are deemed to be artifact instructions and shouldn't be used.
+}{
+\begin{algorithmic}
+\State $y\gets (!)a \mathrel{^\wedge} (!)b$
+\State $a\gets y$
+\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
+\end{algorithmic}
+}{Z, S and P}
 
 % 
 \instruction{}{\underline{}}{
