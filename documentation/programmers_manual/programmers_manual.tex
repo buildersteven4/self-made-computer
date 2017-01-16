@@ -220,11 +220,49 @@ This chapter gives a summary on the instruction set of the [insert name here] pr
 \section{Instruction Types}
 The instructions can be seperated in five types. Two of these types are not meant to be used. 
 \subsection{Move Instructions}
-\subsection{Arithimic Instructions}
+The move instructions copy data from it's source operand to it's target operand. The simpelest move instruction is MOV and does just that. The rest of the move instructions are conditional move instructions, these only copy data when certain conditions are met. These conditions all have to do with previous calculations and use the flags register.
+\begin{description}
+\item[MOVZ]: Move if the zero flag is set.
+\item[MOVNZ]: Move if the zero flag is clear.
+\item[MOVS]: Move if the sign flag is set.
+\item[MOVNS]: Move if the sign flag is clear.
+\item[MOVP]: Move if the parity flag is set.
+\item[MOVNP]: Move if the parity flag is clear.
+\item[MOVO]: Move if the overflow flag is set.
+\item[MOVNO]: Move if the overflow flag is clear.
+\item[MOVC]: Move if the carry flag is set.
+\item[MOVNC]: Move if the carry flag is clear.
+\item[MOV=]: Move if the previous comparison was equal.
+\item[MOV!=]: Move if the previous comparison was unequal.
+\item[MOVU<]: Move if the previous comparison of unsigned integers was smaller.
+\item[MOVU<=]: Move if the previous comparison of unsigned integers was smaller or equal.
+\item[MOVU>=]: Move if the previous comparison of unsigned integers was greater or equal.
+\item[MOVU>]: Move if the previous comparison of unsigned integers was greater.
+\item[MOVS<]: Move if the previous comparison of signed integers was smaller.
+\item[MOVS<=]: Move if the previous comparison of signed integers was smaller or equal.
+\item[MOVS>=]: Move if the previous comparison of signed integers was greater or equal.
+\item[MOVS>]: Move if the previous comparison of signed integers was greater.
+\end{description}
+\subsection{Addition and Subtraction Instructions}
+There preform binary addition and subtraction for both signed and unsigned integers. In all the addition instructions you can two's compliment negate one of the operators. A substraction instruction is an addition instruction with the B operand negated. There are three groups of addition/subtraction instructions:
+\begin{description}
+\item[ADD / SUB]: Add/subtract the two operators.
+\item[ADD1 / SUB1]: Add/subtract the two operators and add/subtract 1.
+\item[ADDC / SUBB]: Add/subtract the two operators and, if the carry flag is set, add/subtract 1.
+\end{description}
+\subsection{Logical Instructions}
+The logical instructions preform simple bitwise logical functions. In all logical Instructions you can one's compliment negate (NOT) one or both of the operands.
+\begin{description}
+\item[OR]: Perform bitwise logical OR.
+\item[AND]: Perform bitwise logical AND.
+\item[XOR]: Perform bitwise logical XOR.
+\end{description}
+\subsection{Shift and Rotate Instructions}
+The shift and rotate instructions shifts or rotates the bits of it's operand 
 \subsection{Control Instructions}
 \subsection{Reserved Instructions}
 \subsection{Artifact Instructions}
-Artifact Instructions are instructions with defined behaviour, but aren't considererd a permanent part of the [insert name here] processor family. These instructions tend to 
+Artifact Instructions are instructions with defined behaviour, but aren't considererd a permanent part of the ABCD processor family. These instructions tend to only exist because it would take more parts to remove them than it takes to leave them in.
 
 \section{Instruction Format}
 \subsection{exceptions}
@@ -268,7 +306,7 @@ Artifact Instructions are instructions with defined behaviour, but aren't consid
 % MOVZ
 \instruction{MOVZ / MOV=}{\underline{Mov}e if \underline{z}ero / \underline{Mov}e if equal}{
 0x00: MOVZ a b \\
-0x00: MOV= a b
+0x00: MOV= a b \emph{(Alternative notation)}
 }{
 Writes B to A if the zero flag is set. This instruction can also be used to only write B to A if, in the last comparison, B was equal to A. The alternative Memnonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
@@ -288,7 +326,7 @@ alternative pseudocode:
 % MOVNZ
 \instruction{MOVNZ / MOV!=}{\underline{Mov}e if \underline{n}ot \underline{z}ero / \underline{Mov}e if not equal}{
 0x01: MOVNZ a b \\
-0x01: MOV!= a b
+0x01: MOV!= a b \emph{(Alternative notation)}
 }{
 Writes B to A if the zero flag is clear. This instruction can also be used to only write B to A if, in the last comparison, B was unequal to A. The alternative Memnonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
@@ -386,7 +424,7 @@ Writes B to A if the overflow flag is clear.
 % MOVC
 \instruction{MOVC / MOVU>}{\underline{Mov}e if \underline{c}arry / \underline{Mov}e if \underline{u}nsigned greater}{
 0x08: MOVC a b \\
-0x08: MOVU> a b
+0x08: MOVU> a b \emph{(Alternative notation)}
 }{
 Writes B to A if the carry flag is set. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was greater than A. The alternative Memnonic MOVU> was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
@@ -406,7 +444,7 @@ alternative pseudocode:
 % MOVNC
 \instruction{MOVNC / MOVU<=}{\underline{Mov}e if \underline{n}o \underline{c}arry / \underline{Mov}e if \underline{u}nsigned smaller or equal}{
 0x09: MOVNC a b \\
-0x09: MOVU<= a b
+0x09: MOVU<= a b \emph{(Alternative notation)}
 }{
 Writes B to A if the carry flag is clear. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was smaller than or equal to A. The alternative Memnonic MOVU<= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
@@ -698,7 +736,8 @@ Does nothing but delay the cpu a minimal amount of cycles.
 0x20: OR a b \\
 0x21: OR !a b \\
 0x22: OR a !b \\
-0x23: OR !a !b
+0x23: OR !a !b \\
+0x23: NAND a b \emph{(Alternative notation)}
 }{
 preforms bitwise logical or operation on A and B and writes the answer to A. The answer is also evaluated to update the status flags. Both operands can be One's Complement Negated (NOT'ed) before the operation in the same instruction. This is marked by the '!' before the operand. 
 }{
@@ -714,7 +753,8 @@ preforms bitwise logical or operation on A and B and writes the answer to A. The
 0x24: AND a b \\
 0x25: AND !a b \\
 0x26: AND a !b \\
-0x27: AND !a !b
+0x27: AND !a !b \\
+0x27: NOR a b \emph{(Alternative notation)}
 }{
 preforms bitwise logical and operation on A and B and writes the answer to A. The answer is also evaluated to update the status flags. Both operands can be One's Complement Negated (NOT'ed) before the operation in the same instruction. This is marked by the '!' before the operand. 
 }{
@@ -729,6 +769,7 @@ preforms bitwise logical and operation on A and B and writes the answer to A. Th
 \instruction{XOR}{Bitwise e\underline{x}clusive \underline{or}}{
 0x28: XOR a b \\
 0x29: XOR !a b \\
+0x29: XAND a b \emph{(Alternative notation)} \\
 0x2A: XOR a !b \emph{(Artifact instruction)}\\
 0x2B: XOR !a !b \emph{(Artifact instruction)}
 }{
@@ -740,6 +781,57 @@ preforms bitwise logical exclusive or operation on A and B and writes the answer
 \State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
 \end{algorithmic}
 }{Z, S and P}
+
+% ADD
+\instruction{ADD / SUB}{\underline{Add}ition / \underline{Sub}traction}{
+0x28: ADD a b \\
+0x29: ADD -a b \\
+0x2A: ADD a -b \\
+0x2A: SUB a b \emph{(Alternative notation)}
+}{
+adds A to B and writes the answer to A. The addition is checked on overflow and carry and the answer is also evaluated to update the status flags. Both operands can be Two's Complement Negated before the operation in the same instruction. This is marked by the '-' before the operand.
+}{
+\begin{algorithmic}
+\State $y\gets (-)a + (-)b$
+\State $a\gets y$
+\State $O, C\gets \Call{CheckAddition}{ }$
+\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
+\end{algorithmic}
+}{Z, S, P, O and C}
+
+% ADD1
+\instruction{ADD1 / SUB1}{\underline{Add}ition plus \underline{1} / \underline{Sub}traction minus \underline{1}}{
+0x28: ADD1 a b \emph{(Artifact instruction)}\\
+0x29: ADD1 -a b \emph{(Artifact instruction)}\\
+0x2A: ADD1 a -b \emph{(Artifact instruction)}\\
+0x2A: SUB1 a b \emph{(Artifact instruction)} \emph{(Alternative notation)}
+}{
+adds A and 1 to B and writes the answer to A. The addition is checked on overflow and carry and the answer is also evaluated to update the status flags. Both operands can be Two's Complement Negated before the operation in the same instruction. This is marked by the '-' before the operand. If one of the operands is negated the extra 1 will be negated as well
+}{
+\begin{algorithmic}
+\State $y\gets (-)a + (-)b + (-)1$
+\State $a\gets y$
+\State $O, C\gets \Call{CheckAddition}{ }$
+\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
+\end{algorithmic}
+}{Z, S, P, O and C}
+
+% ADDC
+\instruction{ADDC / SUBB}{\underline{Add}ition with \underline{c}arry / \underline{Sub}traction with \underline{b}orrow}{
+0x28: ADDC a b \\
+0x29: ADDC -a b \\
+0x2A: ADDC a -b \\
+0x2A: SUBB a b \emph{(Alternative notation)}
+}{
+adds A to B and writes the answer to A, however, if the carry flag is set an extra 1 will be added to the sum. The addition is checked on overflow and carry and the answer is also evaluated to update the status flags. Both operands can be Two's Complement Negated before the operation in the same instruction. This is marked by the '-' before the operand. If one of the operands is negated the extra 1 will be negated as well.
+}{
+\begin{algorithmic}
+\State $y\gets (-)a + (-)b + (-)C$
+\State $a\gets y$
+\State $O, C\gets \Call{CheckAddition}{ }$
+\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
+\end{algorithmic}
+}{Z, S, P, O and C}
 
 % 
 \instruction{}{\underline{}}{
@@ -767,7 +859,7 @@ preforms bitwise logical exclusive or operation on A and B and writes the answer
 \textbf{Decimal} & \textbf{Hex} & \textbf{Binary} &  &  &  \\ \hline 
 \showrowcolors 
 \endhead
-0  & 0x00 & 000000 & MOVZ \& MOV=    & W?    & R?  \\
+0  & 0x00 & 000000 & MOVZ  \& MOV=   & W?    & R?  \\
 1  & 0x01 & 000001 & MOVNZ \& MOV!=  & W?    & R?  \\
 2  & 0x02 & 000010 & MOVS            & W?    & R?  \\
 3  & 0x03 & 000011 & MOVNS           & W?    & R?  \\
@@ -813,16 +905,16 @@ preforms bitwise logical exclusive or operation on A and B and writes the answer
 43 & 0x2B & 101011 & XOR             & !R\&W & !R  \\
 44 & 0x2C & 101100 & ADD             & R\&W  & R   \\
 45 & 0x2D & 101101 & ADD             & !R\&W & R   \\
-46 & 0x2E & 101110 & ADD             & R\&W  & !R  \\
-47 & 0x2F & 101111 & ADD             & !R\&W & !R  \\
+46 & 0x2E & 101110 & ADD   \& SUB    & R\&W  & !R  \\
+47 & 0x2F & 101111 & n/a             & n/a   & n/a \\
 48 & 0x30 & 110000 & ADD1            & R\&W  & R   \\
 49 & 0x31 & 110001 & ADD1            & !R\&W & R   \\
-50 & 0x32 & 110010 & ADD1            & R\&W  & !R  \\
-51 & 0x33 & 110011 & ADD1            & !R\&W & !R  \\
+50 & 0x32 & 110010 & ADD1  \& SUB1   & R\&W  & !R  \\
+51 & 0x33 & 110011 & n/a             & n/a   & n/a \\
 52 & 0x34 & 110100 & ADDC            & R\&W  & R   \\
 53 & 0x35 & 110101 & ADDC            & !R\&W & R   \\
-54 & 0x36 & 110110 & ADDC            & R\&W  & !R  \\
-55 & 0x37 & 110111 & ADDC            & !R\&W & !R  \\
+54 & 0x36 & 110110 & ADDC  \& SUBB   & R\&W  & !R  \\
+55 & 0x37 & 110111 & n/a             & n/a   & n/a \\
 56 & 0x38 & 111000 & SHL             & W     & R   \\
 57 & 0x39 & 111001 & SHL1            & W     & R   \\
 58 & 0x3A & 111010 & RCL             & W     & R   \\
