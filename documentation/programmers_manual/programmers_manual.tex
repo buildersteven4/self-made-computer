@@ -198,25 +198,77 @@ HO & The eigth output register   & 16 \\
 \end{tabular}
 \end{table}
 
-\chapter{Operand Conventions and Addressing Modes}
-This chapter describes
+\chapter{Operand Conventions and Addressing}
+This chapter describes the possible operands and how to use them. The operands are seperated into normal operands and special operands. 
+\section{Operands in Instructions}
+All instructions have two operands, however, some instructions don't use them or only use one. The two operands have a set role. Operand A (the first operand after the instruction) is the output and the secondary input. Operand B (the second operand after the instruction) is the primary input. In other words the processor generally follows this behaviour: read B, optionaly read A, calculate and finally write to A.
+\section{Normal Operands}
+Normal operands simply access the foreground registers. This type of operands is ensured to take the least amount of read and write time, so it is advised to use this operand type for computations.
+\subsection{Exception: ISTR \& ILD}
+The ISTR and ILD alter the behaviour of the normal A and B operands respectively. Instead of the foreground registers the operands access the background registers. There are only four background registers. If ISTR or ILD try to access any of the reserved background register the behaviour of that instruction is undefined.
+\section{Special Operands}
+Special operands make use of the immidiate of an instruction. If both operands of an instruction are special operands then they share the \underline{same} immidiate. The A and B operand have different special operands.
+\subsection{Special Operand A}
+Special operand A is used to access the memory. The operands adds a register to the immidiate and uses the answer of that calculation as memory address. It's also possible to use the immidiate as address directly without the addition. It's possible to read and write both 8-bits and 16-bit.
+\subsection{Special Operand B}
+Special operand B can both be used access the memory or directly. The operands either adds a register to the immidiate and uses the answer of that calculation as memory address, or just uses the answer of the calculation directly as the value of the operand. It's also possible to use the immidiate as address or value directly without the addition.
+\section{List of Operands}
+\begin{table}[h]
+\centering
+\caption{List of Normal Operands}
+\label{tab:List of Normal Operands}
+\begin{tabular}{cclc}
+\hiderowcolors
+\multirow{2}{*}{\textbf{ID}} & \multicolumn{2}{c}{\textbf{Foreground Registers}} & \multirow{2}{*}{\textbf{Length in bits}}\\
+                             & \textbf{Mnonic} & \textbf{Descriptive Name}       & \\ \hline
+\showrowcolors
+0x0 & al & The lower byte of ax  & 8  \\
+0x1 & ah & The higher byte of ax & 8  \\
+0x2 & bl & The lower byte of bx  & 8  \\
+0x3 & bh & The higher byte of bx & 8  \\
+0x4 & cl & The lower byte of cx  & 8  \\
+0x5 & ch & The higher byte of cx & 8  \\
+0x6 & dl & The lower byte of dx  & 8  \\
+0x7 & dh & The higher byte of dx & 8  \\
+0x8 & ax & The first GPR         & 16 \\
+0x9 & bx & The second GPR        & 16 \\
+0xA & cx & The third GPR         & 16 \\
+0xB & dx & The fourth GPR        & 16 \\
+0xC & ex & The fifth GPR         & 16 \\
+0xD & tm & Temporary data        & 16 \\
+0xE & sp & Stack pointer         & 16 \\
+0xF & pc & Program counter       & 16 \\
 
-\section{Operand Conventions}
-\label{sec:Operand Conventions}
+0x0 & n/a & Reserved                  & 8  \\
+0x1 & n/a & Reserved                  & 8  \\
+0x2 & n/a & Reserved                  & 8  \\
+0x3 & n/a & Reserved                  & 8  \\
+0x4 & n/a & Reserved                  & 8  \\
+0x5 & n/a & Reserved                  & 8  \\
+0x6 & n/a & Reserved                  & 8  \\
+0x7 & n/a & Reserved                  & 8  \\
+0x8 & bpc & Program counter backup    & 16 \\
+0x9 & bsf & Segments and flags backup & 16 \\
+0xA & ipc & Interrupt program counter & 16 \\
+0xB & is  & Interrupt segments        & 16 \\
+0xC & n/a & Reserved                  & 16 \\
+0xD & n/a & Reserved                  & 16 \\
+0xE & n/a & Reserved                  & 16 \\
+0xF & n/a & Reserved                  & 16 \\
+
+\end{tabular}
+\end{table}
+
+
+
+\section{Addressing}
+\label{sec:Addressing}
 \subsection{Bit and Byte Ordering}
 \subsection{Aligned and Misaligned Memory Access}
 
-\section{Addressing Modes}
-\subsection{Not From Memory}
-\subsubsection{Register Direct}
-\subsubsection{Absolute}
-\subsubsection{Register with displacement}
-\subsection{From Memory}
-\subsubsection{Direct}
-\subsubsection{Base Plus Displacement}
 
 \chapter{Instruction Set Summary}
-This chapter gives a summary on the instruction set of the [insert name here] processor. It will describe the types of instructions and the binary layout of the instructions.
+This chapter gives a summary on the instruction set of the ABCD processor. It will describe the types of instructions and the binary layout of the instructions.
 \section{Instruction Types}
 The instructions can be seperated in five types. Two of these types are not meant to be used. 
 \subsection{Move Instructions}
