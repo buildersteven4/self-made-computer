@@ -219,7 +219,8 @@ Special operand B can both be used access the memory or directly. The operands e
 \label{tab:List of Normal Operands}
 \begin{tabular}{cclc}
 \hiderowcolors
-\multirow{2}{*}{\textbf{ID}} & \multicolumn{2}{c}{\textbf{Foreground Registers}} & \multirow{2}{*}{\textbf{Length in bits}}\\
+\multirow{2}{*}{\textbf{ID}}
+ & \multicolumn{2}{c}{\textbf{Foreground Registers}} & \multirow{2}{*}{\textbf{Length in bits}}\\
                              & \textbf{Mnonic} & \textbf{Descriptive Name}       & \\ \hline
 \showrowcolors
 0x0 & al & The lower byte of ax  & 8  \\
@@ -309,12 +310,37 @@ The logical instructions preform simple bitwise logical functions. In all logica
 \item[AND]: Perform bitwise logical AND.
 \item[XOR]: Perform bitwise logical XOR.
 \end{description}
-\subsection{Shift and Rotate Instructions}
-The shift and rotate instructions shifts or rotates the bits of it's operand 
+\subsection{Bit Shifting Instructions}
+The bit shifting instructions shift or rotate the bits of its operand by one bit.
+\begin{description}
+\item[SHL]: Shifts all bits one bit left and clears the new least significant bit.
+\item[SHR]: Shifts all bits one bit right and clears the new most significant bit.
+\item[SHL1]: Shifts all bits one bit left and sets the new least significant bit.
+\item[SHR1]: Shifts all bits one bit right and sets the new most significant bit.
+\item[ROL]: Shifts all bits one bit left and writes the old most significant bit to the new least significant bit.
+\item[ROR]: Shifts all bits one bit right and writes the old least significant bit to the new most significant bit
+\item[RCL]: Shifts all bits one bit left and clears new the least significant bit.
+\item[RCR]: Shifts all bits one bit right and clears new the most significant bit.
+\end{description}
 \subsection{Control Instructions}
+Control Instruction change specific parts of the processor state. Unlike the move and computational instructions these instructions don't necessarily read from operand B and write/read from A .
+\begin{description}
+\item[WRI]: Sets or clears the I flag.
+\item[ISTR]: Writes to an background register.
+\item[ILD]: Writes from an background register.
+\item[OUT]: Writes to an output register.
+\item[IN]: Request input from a pheriperal.
+\item[BACK]: Backup the most registers.
+\item[FRET]: Fully restore the last backup and marks and marks any running interrupt done.
+\item[PRET]: Restore the program counter and the stack pointer from the last backup and marks any running interrupt done.
+\item[FJMP]: Restore the program counter and the stack pointer from the last backup.
+\item[HLT]: Halts the processor untill a interrupt is triggered.
+\item[NOP]: Does nothing but delay the processor a bit.
+\end{description}
 \subsection{Reserved Instructions}
+Reserved instructions are instructions with undefined behaviour, meaning they can do anything to the state of the CPU or the RAM. Reserved instructions should never be used in code. However, reserved instructions will never message pheripers, so it's impossible to change non-volatile memory or damage any components. Thus any problems that reserved instructions invoke directly will not persist after restarting the system. 
 \subsection{Artifact Instructions}
-Artifact Instructions are instructions with defined behaviour, but aren't considererd a permanent part of the ABCD processor family. These instructions tend to only exist because it would take more parts to remove them than it takes to leave them in.
+Artifact instructions are instructions with defined behaviour, but aren't considererd a permanent part of the ABCD processor family. These instructions tend to only exist because it would take more parts to remove them than it takes to leave them in.
 
 \section{Instruction Format}
 \subsection{exceptions}
