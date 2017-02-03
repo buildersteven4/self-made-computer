@@ -213,58 +213,118 @@ Special operand A is used to access the memory. The operands adds a register to 
 \subsection{Special Operand B}
 Special operand B can both be used access the memory or directly. The operands either adds a register to the immidiate and uses the answer of that calculation as memory address, or just uses the answer of the calculation directly as the value of the operand. It's also possible to use the immidiate as address or value directly without the addition.
 \section{List of Operands}
-\begin{table}[h]
-\centering
-\caption{List of Normal Operands}
-\label{tab:List of Normal Operands}
-\begin{tabular}{cclc}
+
+\begin{center}
+\begin{longtable}{cclc}
+\caption{List of Operands} 
+\label{tab:List of Operands} \\
 \hiderowcolors
-\multirow{2}{*}{\textbf{ID}} & \multicolumn{2}{c}{\textbf{Foreground Registers}} & \multirow{2}{*}{\textbf{Length in bits}}\\
-                             & \textbf{Mnonic} & \textbf{Descriptive Name}       & \\ \hline
+\textbf{ID}  & \textbf{Mnonic} & \textbf{Description} & \textbf{Length in bits} \\ \hline
+\showrowcolors 
+\endhead
+\hiderowcolors
+\multicolumn{4}{c}{\textbf{Normal Operands}} \\ \hline
 \showrowcolors
-0x0 & al & The lower byte of ax  & 8  \\
-0x1 & ah & The higher byte of ax & 8  \\
-0x2 & bl & The lower byte of bx  & 8  \\
-0x3 & bh & The higher byte of bx & 8  \\
-0x4 & cl & The lower byte of cx  & 8  \\
-0x5 & ch & The higher byte of cx & 8  \\
-0x6 & dl & The lower byte of dx  & 8  \\
-0x7 & dh & The higher byte of dx & 8  \\
-0x8 & ax & The first GPR         & 16 \\
-0x9 & bx & The second GPR        & 16 \\
-0xA & cx & The third GPR         & 16 \\
-0xB & dx & The fourth GPR        & 16 \\
-0xC & ex & The fifth GPR         & 16 \\
-0xD & tm & Temporary data        & 16 \\
-0xE & sp & Stack pointer         & 16 \\
-0xF & pc & Program counter       & 16 \\
+0x00 & al  & The lower byte of ax      & 8  \\
+0x01 & ah  & The higher byte of ax     & 8  \\
+0x02 & bl  & The lower byte of bx      & 8  \\
+0x03 & bh  & The higher byte of bx     & 8  \\
+0x04 & cl  & The lower byte of cx      & 8  \\
+0x05 & ch  & The higher byte of cx     & 8  \\
+0x06 & dl  & The lower byte of dx      & 8  \\
+0x07 & dh  & The higher byte of dx     & 8  \\
+0x08 & ax  & The first GPR             & 16 \\
+0x09 & bx  & The second GPR            & 16 \\
+0x0A & cx  & The third GPR             & 16 \\
+0x0B & dx  & The fourth GPR            & 16 \\
+0x0C & ex  & The fifth GPR             & 16 \\
+0x0D & tm  & Temporary data            & 16 \\
+0x0E & sp  & Stack pointer             & 16 \\
+0x0F & pc  & Program counter           & 16 \\ \hline
+\hiderowcolors
+\multicolumn{4}{c}{\textbf{Exceptions: Operand A of ISTR \& Operand B of ILD}} \\ \hline
+\showrowcolors
+0x00 & n/a & Reserved                  & 8  \\
+0x01 & n/a & Reserved                  & 8  \\
+0x02 & n/a & Reserved                  & 8  \\
+0x03 & n/a & Reserved                  & 8  \\
+0x04 & n/a & Reserved                  & 8  \\
+0x05 & n/a & Reserved                  & 8  \\
+0x06 & n/a & Reserved                  & 8  \\
+0x07 & n/a & Reserved                  & 8  \\
+0x08 & bpc & Program counter backup    & 16 \\
+0x09 & bsf & Segments and flags backup & 16 \\
+0x0A & ipc & Interrupt program counter & 16 \\
+0x0B & is  & Interrupt segments        & 16 \\
+0x0C & n/a & Reserved                  & 16 \\
+0x0D & n/a & Reserved                  & 16 \\
+0x0E & n/a & Reserved                  & 16 \\
+0x0F & n/a & Reserved                  & 16 \\ \hline
+\hiderowcolors
+\multicolumn{4}{c}{\textbf{Exception: Operand A of OUT}} \\ \hline
+\showrowcolors
+0x00 & AO & The first output register   & 16 \\
+0x01 & BO & The second output register  & 16 \\
+0x02 & CO & The third output register   & 16 \\
+0x03 & DO & The fourth output register  & 16 \\
+0x04 & EO & The fifth output register   & 16 \\
+0x05 & FO & The sixth output register   & 16 \\
+0x06 & GO & The seventh output register & 16 \\
+0x07 & HO & The eigth output register   & 16 \\
+0x08 & n/a & Reserved                  & 16 \\
+0x09 & n/a & Reserved                  & 16 \\
+0x0A & n/a & Reserved                  & 16 \\
+0x0B & n/a & Reserved                  & 16 \\
+0x0C & n/a & Reserved                  & 16 \\
+0x0D & n/a & Reserved                  & 16 \\
+0x0E & n/a & Reserved                  & 16 \\
+0x0F & n/a & Reserved                  & 16 \\ \hline
+\hiderowcolors
+\multicolumn{4}{c}{\textbf{Special Operands A}} \\ \hline
+\showrowcolors
+0x10 & [ax+\#]  & The byte at: ax plus the immidiate & 8 \\
+0x11 & [bx+\#]  & The byte at: bx plus the immidiate & 8 \\
+0x12 & [cx+\#]  & The byte at: cx plus the immidiate & 8 \\
+0x13 & [dx+\#]  & The byte at: dx plus the immidiate & 8 \\
+0x14 & [fx+\#]  & The byte at: fx plus the immidiate & 8 \\
+0x15 & [pc+\#]  & The byte at: pc plus the immidiate & 8 \\
+0x16 & [sp+\#]  & The byte at: sp plus the immidiate & 8 \\
+0x17 & [\#]     & The byte at: the immidiate & 8 \\
+0x18 & @[ax+\#] & The word at: ax plus the immidiate & 16 \\
+0x19 & @[bx+\#] & The word at: bx plus the immidiate & 16 \\
+0x1A & @[cx+\#] & The word at: cx plus the immidiate & 16 \\
+0x1B & @[dx+\#] & The word at: dx plus the immidiate & 16 \\
+0x1C & @[fx+\#] & The word at: fx plus the immidiate & 16 \\
+0x1D & @[pc+\#] & The word at: pc plus the immidiate & 16 \\
+0x1E & @[sp+\#] & The word at: sp plus the immidiate & 16 \\
+0x1F & @[\#]    & The word at: the immidiate & 16 \\ \hline
+\hiderowcolors
+\multicolumn{4}{c}{\textbf{Special Operands B}} \\ \hline
+\showrowcolors
+0x10 & [ax+\#]  & The memory at: ax plus the immidiate & (same as A) \\
+0x11 & [bx+\#]  & The memory at: bx plus the immidiate & (same as A) \\
+0x12 & [cx+\#]  & The memory at: cx plus the immidiate & (same as A) \\
+0x13 & [dx+\#]  & The memory at: dx plus the immidiate & (same as A) \\
+0x14 & [fx+\#]  & The memory at: fx plus the immidiate & (same as A) \\
+0x15 & [pc+\#]  & The memory at: pc plus the immidiate & (same as A) \\
+0x16 & [sp+\#]  & The memory at: sp plus the immidiate & (same as A) \\
+0x17 & [\#]     & The memory at: the immidiate & (same as A) \\
+0x18 & ax+\# & ax plus the immidiate & 16 \\
+0x19 & bx+\# & bx plus the immidiate & 16 \\
+0x1A & cx+\# & cx plus the immidiate & 16 \\
+0x1B & dx+\# & dx plus the immidiate & 16 \\
+0x1C & fx+\# & fx plus the immidiate & 16 \\
+0x1D & pc+\# & pc plus the immidiate & 16 \\
+0x1E & sp+\# & sp plus the immidiate & 16 \\
+0x1F & \#    & the immidiate & 16 \\
+\end{longtable}
+\end{center}
 
-0x0 & n/a & Reserved                  & 8  \\
-0x1 & n/a & Reserved                  & 8  \\
-0x2 & n/a & Reserved                  & 8  \\
-0x3 & n/a & Reserved                  & 8  \\
-0x4 & n/a & Reserved                  & 8  \\
-0x5 & n/a & Reserved                  & 8  \\
-0x6 & n/a & Reserved                  & 8  \\
-0x7 & n/a & Reserved                  & 8  \\
-0x8 & bpc & Program counter backup    & 16 \\
-0x9 & bsf & Segments and flags backup & 16 \\
-0xA & ipc & Interrupt program counter & 16 \\
-0xB & is  & Interrupt segments        & 16 \\
-0xC & n/a & Reserved                  & 16 \\
-0xD & n/a & Reserved                  & 16 \\
-0xE & n/a & Reserved                  & 16 \\
-0xF & n/a & Reserved                  & 16 \\
 
-\end{tabular}
-\end{table}
-
-
-
-\section{Addressing}
-\label{sec:Addressing}
-\subsection{Bit and Byte Ordering}
-\subsection{Aligned and Misaligned Memory Access}
+\chapter{Addressing}
+\label{ch:Addressing}
+\section{Bit and Byte Ordering}
+\section{Aligned and Misaligned Memory Access}
 
 
 \chapter{Instruction Set Summary}
@@ -296,11 +356,11 @@ The move instructions copy data from it's source operand to it's target operand.
 \item[MOVS>]: Move if the previous comparison of signed integers was greater.
 \end{description}
 \subsection{Addition and Subtraction Instructions}
-There preform binary addition and subtraction for both signed and unsigned integers. In all the addition instructions you can two's compliment negate one of the operators. A substraction instruction is an addition instruction with the B operand negated. There are three groups of addition/subtraction instructions:
+There preform binary addition and subtraction for both signed and unsigned integers. In all the addition instructions you can two's compliment negate one of the operands. A substraction instruction is an addition instruction with the B operand negated. There are three groups of addition/subtraction instructions:
 \begin{description}
-\item[ADD / SUB]: Add/subtract the two operators.
-\item[ADD1 / SUB1]: Add/subtract the two operators and add/subtract 1.
-\item[ADDC / SUBB]: Add/subtract the two operators and, if the carry flag is set, add/subtract 1.
+\item[ADD / SUB]: Add/subtract the two operands.
+\item[ADD1 / SUB1]: Add/subtract the two operands and add/subtract 1.
+\item[ADDC / SUBB]: Add/subtract the two operands and, if the carry flag is set, add/subtract 1.
 \end{description}
 \subsection{Logical Instructions}
 The logical instructions preform simple bitwise logical functions. In all logical Instructions you can one's compliment negate (NOT) one or both of the operands.
@@ -905,7 +965,7 @@ adds A to B and writes the answer to A, however, if the carry flag is set an ext
 \begin{center}
 \begin{longtable}{ccclcc}
 \caption{List of instructions sorted by opcode} 
-\label{opcode_sorted_instructions_list} \\
+\label{tab:opcode_sorted_instructions_list} \\
 \hiderowcolors
 \multicolumn{3}{c}{\textbf{Opcode}} & \multirow{2}{*}{\textbf{Memnonic}} & \multirow{2}{*}{\textbf{Operand A}} & \multirow{2}{*}{\textbf{Operand B}} \\
 \textbf{Decimal} & \textbf{Hex} & \textbf{Binary} &  &  &  \\ \hline 
