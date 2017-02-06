@@ -6,6 +6,7 @@
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage[table]{xcolor}
+\usepackage{tikz}
 \usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
 
@@ -132,13 +133,42 @@ Background registers can only accessed with the instructions BSTR and BLD.
 \end{table}
 \subsection{Backup Registers}
 The backup registers are used to backup the state of the CPU (see \autoref{sec:State Preservation}). The foreground registers, segment registers and flags register all have their own backup register. However, most backup register aren't background registers. Only the segment registers, program counter register and flags register have directly accessable backup registers. Note that both segment registers and the flag register share one 16-bit backup register.
-%TODO: add bit layout for bsf
+\begin{description}
+\item[CS]: The code segment, This holds the index of the segment that is used to fetch instructions from the memory (see \autoref{}).
+\item[DS]: The data segment, This holds the index of the segment that is used to read data from and write data to the memory (see \autoref{}).
+\item[Z, S, P, O, C and I]: The flags, these hold data about the state of the processor or control how the processor behaves (see \autoref{sub:Flags Register})
+\end{description}
+\begin{figure}[h!]
+\begin{center}
+\caption{Instruction Layout}
+\begin{tikzpicture}[scale=.7]
+\draw [thick] (0,0) rectangle (1,-1) node[pos=.5] {I};
+\node[above] at (0,0) {15};
+\node[above] at (1,0) {14};
+\draw [thick] (1,0) rectangle (2,-1) node[pos=.5] {C};
+\node[above] at (2,0) {13};
+\draw [thick] (2,0) rectangle (3,-1) node[pos=.5] {O};
+\node[above] at (3,0) {12};
+\draw [thick] (3,0) rectangle (4,-1) node[pos=.5] {P};
+\node[above] at (4,0) {11};
+\draw [thick] (4,0) rectangle (5,-1) node[pos=.5] {S};
+\node[above] at (5,0) {10};
+\draw [thick] (5,0) rectangle (6,-1) node[pos=.5] {Z};
+\node[above] at (6,0) {9};
+\draw [thick] (6,0) rectangle (11,-1) node[pos=.5] {DS (5)};
+\node[above] at (11,0) {4};
+\draw [thick] (11,0) rectangle (16,-1) node[pos=.5] {CS (5)};
+\node[above] at (16,0) {0};
+\end{tikzpicture}
+\end{center}
+\end{figure}
 \subsection{Interrupt Registers}
 The Interrupt registers hold the new state the CPU should jump to when an interrupt is triggered (see \autoref{ch:Interrupts}). Only the segement registers and the program counter have an interrupt register.
 %TODO: add bit layout for is
 \section{Indirect Registers}
 Indirect registers are registers that software can't directly read nor write to with any instruction. All the backup registers that aren't background registers fall under this catogory. All the indirect registers can only be written to and read from via the state preservation system (see \autoref{sec:State Preservation}).
 \subsection{Flags Register}
+\label{sub:Flags Register}
 The flags register holds multiple flags (see \autoref{tab:List of Flags}). There are two types of flags: status flags and control flags. Status flags give software extra information about the last computation made, while control flags control how the cpu behaves. There is only one control flag in the [insert name here] processor, the interrupts enabled flag. If this flag is set to zero interrupt requests will be ignored (see \autoref{sec:Interrupt Enabling/Disabling}).
 \begin{description}
 \item[Zero flag]: If the result of the last computation is equal to zero this flag will be set, otherwise it will be cleared.
@@ -198,7 +228,8 @@ HO & The eigth output register   & 16 \\
 \end{tabular}
 \end{table}
 
-\chapter{Operand Conventions and Addressing}
+\chapter{Operand Conventions}
+\label{ch:Operand Conventions}
 This chapter describes the possible operands and how to use them. The operands are seperated into normal operands and special operands. 
 \section{Operands in Instructions}
 All instructions have two operands, however, some instructions don't use them or only use one. The two operands have a set role. Operand A (the first operand after the instruction) is the output and the secondary input. Operand B (the second operand after the instruction) is the primary input. In other words the processor generally follows this behaviour: read B, optionaly read A, calculate and finally write to A.
@@ -328,6 +359,7 @@ Special operand B can both be used access the memory or directly. The operands e
 
 
 \chapter{Instruction Set Summary}
+\label{ch:Instruction Set Summary}
 This chapter gives a summary on the instruction set of the ABCD processor. It will describe the types of instructions and the binary layout of the instructions.
 \section{Instruction Types}
 The instructions can be seperated in five types. Two of these types are not meant to be used. 
@@ -402,7 +434,30 @@ Reserved instructions are instructions with undefined behaviour, meaning they ca
 Artifact instructions are instructions with defined behaviour, but aren't considererd a permanent part of the ABCD processor family. These instructions tend to only exist because it would take more parts to remove them than it takes to leave them in.
 
 \section{Instruction Format}
-\subsection{exceptions}
+All instructions follow one single format. The format has four parts:
+\begin{description}
+\item[OP]: The opcode, this describes what operation will be excecuted by this instruction (see \autoref{app:Instruction Set Listings}).
+\item[A]: Operand A, This describes what the instruction will use as output and secondary input (see \autoref{tab:List of Operands}).
+\item[B]: Operand B, This describes what the instruction will use primary input (see \autoref{tab:List of Operands}).
+\item[\#]: The immediate, This is number is used by some operands to add to it's data or offset it's address.
+\end{description}
+\begin{figure}[h!]
+\begin{center}
+\caption{Instruction Layout}
+\begin{tikzpicture}
+\draw [thick] (0,0) rectangle (8,-1) node[pos=.5] {\# (16)};
+\node[above] at (0, 0) {31};
+\node[above] at (8, 0) {16};
+\draw [thick] (0.0,-1) rectangle (2.5,-2) node[pos=.5] {B (5)};
+\node[below] at (0, -2) {15};
+\node[below] at (2.5, -2) {10};
+\draw [thick] (2.5,-1) rectangle (5,-2) node[pos=.5] {A (5)};
+\node[below] at (5.0, -2) {5};
+\draw [thick] (5.0,-1) rectangle (8,-2) node[pos=.5] {OP (6)};
+\node[below] at (8.0, -2) {0};
+\end{tikzpicture}
+\end{center}
+\end{figure}
 
 \chapter{Memory Management}
 \label{ch:Memory Management}
@@ -438,6 +493,7 @@ Artifact instructions are instructions with defined behaviour, but aren't consid
 \subsection{Problem with Interrupts}
 
 \chapter{Instruction Set}
+\label{ch:Instruction Set}
 \clearpage
 
 % MOVZ
@@ -986,12 +1042,12 @@ adds A to B and writes the answer to A, however, if the carry flag is set an ext
 \appendix
 %\backmatter
 \chapter{Instruction Set Listings}
-
+\label{app:Instruction Set Listings}
 \begin{center}
 \begin{longtable}{ccclcc}
+\hiderowcolors
 \caption{List of instructions sorted by opcode} 
 \label{tab:opcode_sorted_instructions_list} \\
-\hiderowcolors
 \multicolumn{3}{c}{\textbf{Opcode}} & \multirow{2}{*}{\textbf{Memnonic}} & \multirow{2}{*}{\textbf{Operand A}} & \multirow{2}{*}{\textbf{Operand B}} \\
 \textbf{Decimal} & \textbf{Hex} & \textbf{Binary} &  &  &  \\ \hline 
 \showrowcolors 
