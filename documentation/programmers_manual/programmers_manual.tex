@@ -7,6 +7,8 @@
 \usepackage{longtable}
 \usepackage[table]{xcolor}
 \usepackage{tikz}
+\usetikzlibrary{patterns}
+\usepackage{contour}
 \usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
 
@@ -140,23 +142,23 @@ The backup registers are used to backup the state of the CPU (see \autoref{sec:S
 \end{description}
 \begin{figure}[h!]
 \begin{center}
-\caption{Instruction Layout}
+\caption{Segments and Flags Backup Register's Layout}
 \begin{tikzpicture}[scale=.7]
 \draw [thick] (0,0) rectangle (1,-1) node[pos=.5] {I};
-\node[above] at (0,0) {15};
-\node[above] at (1,0) {14};
+\node[above] at (0,0) {16};
+\node[above] at (1,0) {15};
 \draw [thick] (1,0) rectangle (2,-1) node[pos=.5] {C};
-\node[above] at (2,0) {13};
+\node[above] at (2,0) {14};
 \draw [thick] (2,0) rectangle (3,-1) node[pos=.5] {O};
-\node[above] at (3,0) {12};
+\node[above] at (3,0) {13};
 \draw [thick] (3,0) rectangle (4,-1) node[pos=.5] {P};
-\node[above] at (4,0) {11};
+\node[above] at (4,0) {12};
 \draw [thick] (4,0) rectangle (5,-1) node[pos=.5] {S};
-\node[above] at (5,0) {10};
+\node[above] at (5,0) {11};
 \draw [thick] (5,0) rectangle (6,-1) node[pos=.5] {Z};
-\node[above] at (6,0) {9};
+\node[above] at (6,0) {10};
 \draw [thick] (6,0) rectangle (11,-1) node[pos=.5] {DS (5)};
-\node[above] at (11,0) {4};
+\node[above] at (11,0) {5};
 \draw [thick] (11,0) rectangle (16,-1) node[pos=.5] {CS (5)};
 \node[above] at (16,0) {0};
 \end{tikzpicture}
@@ -164,7 +166,26 @@ The backup registers are used to backup the state of the CPU (see \autoref{sec:S
 \end{figure}
 \subsection{Interrupt Registers}
 The Interrupt registers hold the new state the CPU should jump to when an interrupt is triggered (see \autoref{ch:Interrupts}). Only the segement registers and the program counter have an interrupt register.
-%TODO: add bit layout for is
+\begin{description}
+\item[CS]: The code segment, This holds the index of the segment that is used to fetch instructions from the memory (see \autoref{}).
+\item[DS]: The data segment, This holds the index of the segment that is used to read data from and write data to the memory (see \autoref{}).
+\end{description}
+\begin{figure}[h!]
+\begin{center}
+\caption{Segments Interrupt Register's Layout}
+\contourlength{1pt}
+\contournumber{20}
+\begin{tikzpicture}[scale=.7]
+\draw[thick, pattern=north west lines, pattern color=gray] (0,0) rectangle (6,-1) node[pos=.5] {\contour{white}{RESERVED (6)}};
+\node[above] at (0,0) {16};
+\node[above] at (6,0) {10};
+\draw[thick] (6,0) rectangle (11,-1) node[pos=.5] {DS (5)};
+\node[above] at (11,0) {5};
+\draw[thick] (11,0) rectangle (16,-1) node[pos=.5] {CS (5)};
+\node[above] at (16,0) {0};
+\end{tikzpicture}
+\end{center}
+\end{figure}
 \section{Indirect Registers}
 Indirect registers are registers that software can't directly read nor write to with any instruction. All the backup registers that aren't background registers fall under this catogory. All the indirect registers can only be written to and read from via the state preservation system (see \autoref{sec:State Preservation}).
 \subsection{Flags Register}
@@ -209,7 +230,7 @@ DS & Data segment index & 5 \\
 \end{table}
 \section{Output Registers}
 The output registers (see \autoref{tab:List of Output Registers}) hold information that is sent to the pheripherals (see \autoref{ch:I/O Conventions})
-\begin{table}[h]
+\begin{table}[h!]
 \centering
 \caption{List of Output Registers}
 \label{tab:List of Output Registers}
@@ -248,9 +269,10 @@ Special operand B can both be used access the memory or directly. The operands e
 \begin{center}
 \begin{longtable}{cclc}
 \caption{List of Operands} 
-\label{tab:List of Operands} \\
+\label{tab:List of Operands} \hline
+\endfirsthead
 \hiderowcolors
-\textbf{ID}  & \textbf{Mnonic} & \textbf{Description} & \textbf{Length in bits} \\ \hline
+\textbf{ID}  & \textbf{Mnonic} & \textbf{Description} & \textbf{\vtop{\hbox{\strut Length}\hbox{\strut in bits}}} \\ \hline
 \showrowcolors 
 \endhead
 \hiderowcolors
@@ -328,18 +350,18 @@ Special operand B can both be used access the memory or directly. The operands e
 0x1C & @[fx+\#] & The word at: fx plus the immidiate & 16 \\
 0x1D & @[pc+\#] & The word at: pc plus the immidiate & 16 \\
 0x1E & @[sp+\#] & The word at: sp plus the immidiate & 16 \\
-0x1F & @[\#]    & The word at: the immidiate & 16 \\ \hline
+0x1F & @[\#]    & The word at: the immidiate         & 16 \\ \hline
 \hiderowcolors
 \multicolumn{4}{c}{\textbf{Special Operands B}} \\ \hline
 \showrowcolors
-0x10 & [ax+\#]  & The memory at: ax plus the immidiate & (same as A) \\
-0x11 & [bx+\#]  & The memory at: bx plus the immidiate & (same as A) \\
-0x12 & [cx+\#]  & The memory at: cx plus the immidiate & (same as A) \\
-0x13 & [dx+\#]  & The memory at: dx plus the immidiate & (same as A) \\
-0x14 & [fx+\#]  & The memory at: fx plus the immidiate & (same as A) \\
-0x15 & [pc+\#]  & The memory at: pc plus the immidiate & (same as A) \\
-0x16 & [sp+\#]  & The memory at: sp plus the immidiate & (same as A) \\
-0x17 & [\#]     & The memory at: the immidiate & (same as A) \\
+0x10 & [ax+\#]  & Memory from: ax plus the immidiate & same as A \\
+0x11 & [bx+\#]  & Memory from: bx plus the immidiate & same as A \\
+0x12 & [cx+\#]  & Memory from: cx plus the immidiate & same as A \\
+0x13 & [dx+\#]  & Memory from: dx plus the immidiate & same as A \\
+0x14 & [fx+\#]  & Memory from: fx plus the immidiate & same as A \\
+0x15 & [pc+\#]  & Memory from: pc plus the immidiate & same as A \\
+0x16 & [sp+\#]  & Memory from: sp plus the immidiate & same as A \\
+0x17 & [\#]     & Memory from: the immidiate         & same as A \\
 0x18 & ax+\# & ax plus the immidiate & 16 \\
 0x19 & bx+\# & bx plus the immidiate & 16 \\
 0x1A & cx+\# & cx plus the immidiate & 16 \\
@@ -347,7 +369,7 @@ Special operand B can both be used access the memory or directly. The operands e
 0x1C & fx+\# & fx plus the immidiate & 16 \\
 0x1D & pc+\# & pc plus the immidiate & 16 \\
 0x1E & sp+\# & sp plus the immidiate & 16 \\
-0x1F & \#    & the immidiate & 16 \\
+0x1F & \#    & the immidiate         & 16 \\
 \end{longtable}
 \end{center}
 
@@ -444,17 +466,17 @@ All instructions follow one single format. The format has four parts:
 \begin{figure}[h!]
 \begin{center}
 \caption{Instruction Layout}
-\begin{tikzpicture}
-\draw [thick] (0,0) rectangle (8,-1) node[pos=.5] {\# (16)};
-\node[above] at (0, 0) {31};
-\node[above] at (8, 0) {16};
-\draw [thick] (0.0,-1) rectangle (2.5,-2) node[pos=.5] {B (5)};
-\node[below] at (0, -2) {15};
-\node[below] at (2.5, -2) {10};
-\draw [thick] (2.5,-1) rectangle (5,-2) node[pos=.5] {A (5)};
-\node[below] at (5.0, -2) {5};
-\draw [thick] (5.0,-1) rectangle (8,-2) node[pos=.5] {OP (6)};
-\node[below] at (8.0, -2) {0};
+\begin{tikzpicture}[scale=.7]
+\draw [thick] (0,0) rectangle (16,-1) node[pos=.5] {\# (16)};
+\node[above] at (0, 0) {32};
+\node[above] at (16, 0) {16};
+\draw [thick] (0.0,-1) rectangle (5,-2) node[pos=.5] {B (5)};
+\node[below] at (0, -2) {16};
+\node[below] at (5, -2) {11};
+\draw [thick] (5,-1) rectangle (10,-2) node[pos=.5] {A (5)};
+\node[below] at (10, -2) {6};
+\draw [thick] (10,-1) rectangle (16,-2) node[pos=.5] {OP (6)};
+\node[below] at (16, -2) {0};
 \end{tikzpicture}
 \end{center}
 \end{figure}
