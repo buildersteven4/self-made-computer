@@ -28,7 +28,8 @@
 
 \begin{document}
 % Title
-\title{SGPC Programmer's Manual}
+\title{ABCD Programmer's Manual \\
+\large A Basic Computer Design (draft 1)}
 \author{Steven Vroom}
 \date{November 2016}
 \maketitle
@@ -47,28 +48,52 @@
 \listoftables
 \cleardoublepage
 
-\chapter{About This Manual}
-\section{Related Documentation}
-\section{Organization}
-\section{Conventions}
-\section{Acronyms and Abbreviations}
+%\chapter{About This Manual}
+%\section{Related Documentation}
+%\section{Organization}
+%\section{Conventions}
+%\section{Acronyms and Abbreviations}
 
 % Main Matter
 \mainmatter
 \chapter{Overview}
-\section{SGPC Architecture Overview}
+This chapter gives a brief overview of the ABCD processor's features. 
+\section{ABCD Architecture Overview}
+ABCD stands for A Basic Computer Design. The ABCD processor has been designed with simplicity as primary goal. Both the design and usage of this processor and architecture were to be simple so this computer is bare-bones without it becoming awkward to program for. Because of the simplicity of the design the production cost of a ABCD processor should be cheap. However, security and speed were never a big concern in the design of the ABCD system, so while it should be fast enough to run simple graphical interfaces it's sub-par to the personal computers currently available.
 \section{Registers}
-\subsection{User-accessible Registers}
-\subsection{Internal Registers}
+The ABCD processor has a few types of registers:
+\begin{description}
+\item[Foreground Registers]: The foreground registers are the registers most instructions access. These registers hold data for computations or addresses, the program counter is a foreground register.
+\item[Background Registers]: The background registers are only accessible by a few instructions, these registers control rather specific things and aren't meant for regular data handling.
+\item[Backup Registers]: For all foreground registers and some other registers there are backup registers, these hold a copy of the data in their respective register. These registers are primarily used to save the state of the processor during an interrupt. Some of the backup registers are background registers.
+\item[Interrupt Registers]: These registers hold data that is needed to start an interrupt. These registers are also background Registers.
+\item[Output Registers]: These registers can be written to using the OUT instruction, and can be read by peripherals.
+\item[Flag Registers]: These registers hold data about previous computations or control the behaviour of the processor. These registers are used in conditional move instructions.
+\end{description}
 \section{Instruction Conventions}
-\subsection{Instruction Layout}
-\subsection{Addressing Modes}
+All instructions in an ABCD processor have four parts:
+\begin{description}
+\item[Opcode]: This describes what operation will be executed by this instruction.
+\item[Operand A]: This describes what the instruction will use as output and secondary input.
+\item[Operand B]: This describes what the instruction will use as primary input.
+\item[The Immediate]: This is number is used by some operands to add to it's data or offset it's address.
+\end{description}
+\subsection{Operands}
+There are two types of operands (omitting exceptions), normal and special operands. Normal operands just directly access the foreground registers. Special operands use the Immediate. Special operands either access memory via a register offsetted with the immediate or add a register to the immediate. Note that operand A and B do not share the exact same special operands.
 \section{Instruction Set}
-\section{Interrupt Model}
-\section{Memory Management Model}
-
+There are roughly three types of instructions:
+\begin{description}
+\item[Move Instructions]: Move instructions simply write data from operand B to operand A. There are some conditional jumps available that only copy data when certain conditions are met. Note that a move instruction where operand A is the Program Counter is effectively a "jump" instruction.
+\item[Computational Instructions]: These instructions use the data from operand B and optionally operand A to compute something and write the answer to operand A. The computational instructions are all quite basic but are presented in a rather flexible way.
+\item[Control Instructions]: The control instructions change specific parts of the processor state. Unlike the move and computational instructions these instructions don't necessarily read from operand B and write/read from operand A.
+\end{description}
+\section{Interrupts}
+After executing an instruction the processor checks if an external interrupt is waiting. If there is and interrupts are enabled the processor will start the processor procedure. First it will run a backup using the backup registers. Then it will it will set up the interrupt handler using the interrupt registers. It does this by far jumping to the interrupt handler. Note that there is only one interrupt handler shared by all sources of interrupts. then it will prevent further interrupts using an internal register. After all that is done it will start running the interrupt handler code like any other piece of code. Once the interrupt handler is done a PRET or FRET instruction can be used to restore the state of the processor and resume the normal code paths. running PRET or FRET will also lift the interrupt block that started with the interrupt.
+\section{Memory Management}
+The ABCD processor uses segmented memory to manage memory. In the processor is a small list of segments. These segments have a base and a offset. The processor uses a code segment and data segment. The code segment is used to fetch instructions. The data segment is used to write and read to the memory using special instruction operands. The code and data segments are selected by two indices in a background register. These indices can change during an interrupt, an restore (FRET, PRET, FJMP), or a background write (ISTR).
+ 
 \chapter{Register Set}
-This chapter describes the registers seperated in four groups based on accessability. however, the internal registers are omitted from this chapter since these are implementation specific.
+This chapter describes the registers separated in four groups based on accessibility. however, the internal registers are omitted from this chapter since these are implementation specific.
 \section{Foreground Registers}
 The foreground registers are the registers all regular instructions can read from and write to. There are eight 8-bit and eight 16-bit foreground registers. These registers are preserved in interrupts.
 \begin{table}[h]
@@ -77,7 +102,7 @@ The foreground registers are the registers all regular instructions can read fro
 \label{tab:List of Foreground Registers}
 \begin{tabular}{cclc}
 \hiderowcolors
-\textbf{ID}  & \textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
+\textbf{ID}  & \textbf{Mnemonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
 \showrowcolors
 0x0 & al & The lower byte of ax  & 8  \\
 0x1 & ah & The higher byte of ax & 8  \\
@@ -97,8 +122,8 @@ The foreground registers are the registers all regular instructions can read fro
 0xF & pc & Program counter       & 16 \\
 \end{tabular}
 \end{table}
-\subsection{General-Purpose Registers (GPRs)}
-These registers are meant for computing storage. The first four 16-bit registers are all splitted into two 8-bit registers. So software can directly access the upper and lower byte of these 16-bit registers.
+\subsection{General-Purpose Registers (GPR)}
+These registers are meant for computing storage. The first four 16-bit registers are all split into two 8-bit registers. So software can directly access the upper and lower byte of these 16-bit registers.
 \subsection{Temporary Data Register}
 This registers is meant to facilitate call procedures. So it won't be preserved in a function call. However this nothing more than a suggestion to the user, software can use this register as a regular GPR.
 \subsection{Stack Pointer Register (SP)}
@@ -113,7 +138,7 @@ Background registers can only accessed with the instructions BSTR and BLD.
 \label{tab:List of Background Registers}
 \begin{tabular}{cclc}
 \hiderowcolors
-\textbf{ID}  & \textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
+\textbf{ID}  & \textbf{Mnemonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
 \showrowcolors
 0x0 & n/a & Reserved                  & 8  \\
 0x1 & n/a & Reserved                  & 8  \\
@@ -134,7 +159,7 @@ Background registers can only accessed with the instructions BSTR and BLD.
 \end{tabular}
 \end{table}
 \subsection{Backup Registers}
-The backup registers are used to backup the state of the CPU (see \autoref{sec:State Preservation}). The foreground registers, segment registers and flags register all have their own backup register. However, most backup register aren't background registers. Only the segment registers, program counter register and flags register have directly accessable backup registers. Note that both segment registers and the flag register share one 16-bit backup register.
+The backup registers are used to backup the state of the processor (see \autoref{sec:State Preservation}). The foreground registers, segment registers and flags register all have their own backup register. However, most backup register aren't background registers. Only the segment registers, program counter register and flags register have directly accessible backup registers. Note that both segment registers and the flag register share one 16-bit backup register.
 \begin{description}
 \item[CS]: The code segment, This holds the index of the segment that is used to fetch instructions from the memory (see \autoref{}).
 \item[DS]: The data segment, This holds the index of the segment that is used to read data from and write data to the memory (see \autoref{}).
@@ -165,7 +190,7 @@ The backup registers are used to backup the state of the CPU (see \autoref{sec:S
 \end{center}
 \end{figure}
 \subsection{Interrupt Registers}
-The Interrupt registers hold the new state the CPU should jump to when an interrupt is triggered (see \autoref{ch:Interrupts}). Only the segement registers and the program counter have an interrupt register.
+The Interrupt registers hold the new state the processor should jump to when an interrupt is triggered (see \autoref{ch:Interrupts}). Only the segment registers and the program counter have an interrupt register.
 \begin{description}
 \item[CS]: The code segment, This holds the index of the segment that is used to fetch instructions from the memory (see \autoref{}).
 \item[DS]: The data segment, This holds the index of the segment that is used to read data from and write data to the memory (see \autoref{}).
@@ -187,10 +212,10 @@ The Interrupt registers hold the new state the CPU should jump to when an interr
 \end{center}
 \end{figure}
 \section{Indirect Registers}
-Indirect registers are registers that software can't directly read nor write to with any instruction. All the backup registers that aren't background registers fall under this catogory. All the indirect registers can only be written to and read from via the state preservation system (see \autoref{sec:State Preservation}).
+Indirect registers are registers that software can't directly read nor write to with any instruction. All the backup registers that aren't background registers fall under this category. All the indirect registers can only be written to and read from via the state preservation system (see \autoref{sec:State Preservation}).
 \subsection{Flags Register}
 \label{sub:Flags Register}
-The flags register holds multiple flags (see \autoref{tab:List of Flags}). There are two types of flags: status flags and control flags. Status flags give software extra information about the last computation made, while control flags control how the cpu behaves. There is only one control flag in the [insert name here] processor, the interrupts enabled flag. If this flag is set to zero interrupt requests will be ignored (see \autoref{sec:Interrupt Enabling/Disabling}).
+The flags register holds multiple flags (see \autoref{tab:List of Flags}). There are two types of flags: status flags and control flags. Status flags give software extra information about the last computation made, while control flags control how the processor behaves. There is only one control flag in the [insert name here] processor, the interrupts enabled flag. If this flag is set to zero interrupt requests will be ignored (see \autoref{sec:Interrupt Enabling/Disabling}).
 \begin{description}
 \item[Zero flag]: If the result of the last computation is equal to zero this flag will be set, otherwise it will be cleared.
 \item[Sign flag]: If the most significant  bit of the result of the last computation is set this flag will be set, otherwise it will be cleared.
@@ -204,7 +229,7 @@ The flags register holds multiple flags (see \autoref{tab:List of Flags}). There
 \label{tab:List of Flags}
 \begin{tabular}{cllc}
 \hiderowcolors
-\textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Type of flag} & \textbf{Length in bits} \\ \hline
+\textbf{Mnemonic} & \textbf{Descriptive Name} & \textbf{Type of flag} & \textbf{Length in bits} \\ \hline
 \showrowcolors
 Z & Zero flag               & Status flag  & 1 \\
 S & Sign flag               & Status flag  & 1 \\
@@ -222,21 +247,21 @@ The segment registers (see \autoref{tab:List of Segment Registers}) hold the ind
 \label{tab:List of Segment Registers}
 \begin{tabular}{clc}
 \hiderowcolors
-\textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
+\textbf{Mnemonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
 \showrowcolors
 CS & Code segment index & 5 \\
 DS & Data segment index & 5 \\
 \end{tabular}
 \end{table}
 \section{Output Registers}
-The output registers (see \autoref{tab:List of Output Registers}) hold information that is sent to the pheripherals (see \autoref{ch:I/O Conventions})
-\begin{table}[h!]
+The output registers (see \autoref{tab:List of Output Registers}) hold information that is sent to the peripherals (see \autoref{ch:I/O Conventions})
+\begin{table}[h]
 \centering
 \caption{List of Output Registers}
 \label{tab:List of Output Registers}
 \begin{tabular}{clc}
 \hiderowcolors
-\textbf{Mnonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
+\textbf{Mnemonic} & \textbf{Descriptive Name} & \textbf{Length in bits} \\ \hline
 \showrowcolors
 AO & The first output register   & 16 \\
 BO & The second output register  & 16 \\
@@ -245,148 +270,147 @@ DO & The fourth output register  & 16 \\
 EO & The fifth output register   & 16 \\
 FO & The sixth output register   & 16 \\
 GO & The seventh output register & 16 \\
-HO & The eigth output register   & 16 \\
+HO & The eighth output register   & 16 \\
 \end{tabular}
 \end{table}
 
 \chapter{Operand Conventions}
 \label{ch:Operand Conventions}
-This chapter describes the possible operands and how to use them. The operands are seperated into normal operands and special operands. 
+This chapter describes the possible operands and how to use them. The operands are separated into normal operands and special operands. 
 \section{Operands in Instructions}
-All instructions have two operands, however, some instructions don't use them or only use one. The two operands have a set role. Operand A (the first operand after the instruction) is the output and the secondary input. Operand B (the second operand after the instruction) is the primary input. In other words the processor generally follows this behaviour: read B, optionaly read A, calculate and finally write to A.
+All instructions have two operands, however, some instructions don't use them or only use one. The two operands have a set role. Operand A (the first operand after the instruction) is the output and the secondary input. Operand B (the second operand after the instruction) is the primary input. In other words the processor generally follows this behaviour: read B, optionally read A, calculate and finally write to A.
 \section{Normal Operands}
 Normal operands simply access the foreground registers. This type of operands is ensured to take the least amount of read and write time, so it is advised to use this operand type for computations.
 \subsection{Exception: ISTR \& ILD}
 The ISTR and ILD alter the behaviour of the normal A and B operands respectively. Instead of the foreground registers the operands access the background registers. There are only four background registers. If ISTR or ILD try to access any of the reserved background register the behaviour of that instruction is undefined.
 \section{Special Operands}
-Special operands make use of the immidiate of an instruction. If both operands of an instruction are special operands then they share the \underline{same} immidiate. The A and B operand have different special operands.
+Special operands make use of the immediate of an instruction. If both operands of an instruction are special operands then they share the \underline{same} immediate. The A and B operand have different special operands.
 \subsection{Special Operand A}
-Special operand A is used to access the memory. The operands adds a register to the immidiate and uses the answer of that calculation as memory address. It's also possible to use the immidiate as address directly without the addition. It's possible to read and write both 8-bits and 16-bit.
+Special operand A is used to access the memory. The operands adds a register to the immediate and uses the answer of that calculation as memory address. It's also possible to use the immediate as address directly without the addition. It's possible to read and write both 8-bits and 16-bit.
 \subsection{Special Operand B}
-Special operand B can both be used access the memory or directly. The operands either adds a register to the immidiate and uses the answer of that calculation as memory address, or just uses the answer of the calculation directly as the value of the operand. It's also possible to use the immidiate as address or value directly without the addition.
+Special operand B can both be used access the memory or directly. The operands either adds a register to the immediate and uses the answer of that calculation as memory address, or just uses the answer of the calculation directly as the value of the operand. It's also possible to use the immediate as address or value directly without the addition.
 \section{List of Operands}
 
 \begin{center}
 \begin{longtable}{cclc}
-\caption{List of Operands} 
-\label{tab:List of Operands} \hline
-\endfirsthead
 \hiderowcolors
-\textbf{ID}  & \textbf{Mnonic} & \textbf{Description} & \textbf{\vtop{\hbox{\strut Length}\hbox{\strut in bits}}} \\ \hline
+\caption{List of Operands} 
+\label{tab:List of Operands} \\
+\textbf{ID}  & \textbf{Mnemonic} & \textbf{Description} & \textbf{\vtop{\hbox{\strut Length}\hbox{\strut in bits}}} \\ \hline
+\showrowcolors  
+\endfirsthead
+%
+\hiderowcolors
+\caption*{List of Operands (Continued)} \\
+\textbf{ID}  & \textbf{Mnemonic} & \textbf{Description} & \textbf{\vtop{\hbox{\strut Length}\hbox{\strut in bits}}} \\ \hline
 \showrowcolors 
 \endhead
+%
 \hiderowcolors
-\multicolumn{4}{c}{\textbf{Normal Operands}} \\ \hline
+\multicolumn{4}{c}{\textbf{Normal Operands}} \\* \hline
 \showrowcolors
-0x00 & al  & The lower byte of ax      & 8  \\
-0x01 & ah  & The higher byte of ax     & 8  \\
-0x02 & bl  & The lower byte of bx      & 8  \\
-0x03 & bh  & The higher byte of bx     & 8  \\
-0x04 & cl  & The lower byte of cx      & 8  \\
-0x05 & ch  & The higher byte of cx     & 8  \\
-0x06 & dl  & The lower byte of dx      & 8  \\
-0x07 & dh  & The higher byte of dx     & 8  \\
-0x08 & ax  & The first GPR             & 16 \\
-0x09 & bx  & The second GPR            & 16 \\
-0x0A & cx  & The third GPR             & 16 \\
-0x0B & dx  & The fourth GPR            & 16 \\
-0x0C & ex  & The fifth GPR             & 16 \\
-0x0D & tm  & Temporary data            & 16 \\
-0x0E & sp  & Stack pointer             & 16 \\
-0x0F & pc  & Program counter           & 16 \\ \hline
+0x00 & al       & The lower byte of ax               & 8         \\
+0x01 & ah       & The higher byte of ax              & 8         \\
+0x02 & bl       & The lower byte of bx               & 8         \\
+0x03 & bh       & The higher byte of bx              & 8         \\
+0x04 & cl       & The lower byte of cx               & 8         \\
+0x05 & ch       & The higher byte of cx              & 8         \\
+0x06 & dl       & The lower byte of dx               & 8         \\
+0x07 & dh       & The higher byte of dx              & 8         \\
+0x08 & ax       & The first GPR                      & 16        \\
+0x09 & bx       & The second GPR                     & 16        \\
+0x0A & cx       & The third GPR                      & 16        \\
+0x0B & dx       & The fourth GPR                     & 16        \\
+0x0C & ex       & The fifth GPR                      & 16        \\
+0x0D & tm       & Temporary data                     & 16        \\
+0x0E & sp       & Stack pointer                      & 16        \\
+0x0F & pc       & Program counter                    & 16        \\ \hline \pagebreak[4]
 \hiderowcolors
 \multicolumn{4}{c}{\textbf{Exceptions: Operand A of ISTR \& Operand B of ILD}} \\ \hline
 \showrowcolors
-0x00 & n/a & Reserved                  & 8  \\
-0x01 & n/a & Reserved                  & 8  \\
-0x02 & n/a & Reserved                  & 8  \\
-0x03 & n/a & Reserved                  & 8  \\
-0x04 & n/a & Reserved                  & 8  \\
-0x05 & n/a & Reserved                  & 8  \\
-0x06 & n/a & Reserved                  & 8  \\
-0x07 & n/a & Reserved                  & 8  \\
-0x08 & bpc & Program counter backup    & 16 \\
-0x09 & bsf & Segments and flags backup & 16 \\
-0x0A & ipc & Interrupt program counter & 16 \\
-0x0B & is  & Interrupt segments        & 16 \\
-0x0C & n/a & Reserved                  & 16 \\
-0x0D & n/a & Reserved                  & 16 \\
-0x0E & n/a & Reserved                  & 16 \\
-0x0F & n/a & Reserved                  & 16 \\ \hline
+0x00 & n/a      & Reserved                           & 8         \\
+0x01 & n/a      & Reserved                           & 8         \\
+0x02 & n/a      & Reserved                           & 8         \\
+0x03 & n/a      & Reserved                           & 8         \\
+0x04 & n/a      & Reserved                           & 8         \\
+0x05 & n/a      & Reserved                           & 8         \\
+0x06 & n/a      & Reserved                           & 8         \\
+0x07 & n/a      & Reserved                           & 8         \\
+0x08 & bpc      & Program counter backup             & 16        \\
+0x09 & bsf      & Segments and flags backup          & 16        \\
+0x0A & ipc      & Interrupt program counter          & 16        \\
+0x0B & is       & Interrupt segments                 & 16        \\
+0x0C & n/a      & Reserved                           & 16        \\
+0x0D & n/a      & Reserved                           & 16        \\
+0x0E & n/a      & Reserved                           & 16        \\
+0x0F & n/a      & Reserved                           & 16        \\ \hline
 \hiderowcolors
 \multicolumn{4}{c}{\textbf{Exception: Operand A of OUT}} \\ \hline
 \showrowcolors
-0x00 & AO & The first output register   & 16 \\
-0x01 & BO & The second output register  & 16 \\
-0x02 & CO & The third output register   & 16 \\
-0x03 & DO & The fourth output register  & 16 \\
-0x04 & EO & The fifth output register   & 16 \\
-0x05 & FO & The sixth output register   & 16 \\
-0x06 & GO & The seventh output register & 16 \\
-0x07 & HO & The eigth output register   & 16 \\
-0x08 & n/a & Reserved                  & 16 \\
-0x09 & n/a & Reserved                  & 16 \\
-0x0A & n/a & Reserved                  & 16 \\
-0x0B & n/a & Reserved                  & 16 \\
-0x0C & n/a & Reserved                  & 16 \\
-0x0D & n/a & Reserved                  & 16 \\
-0x0E & n/a & Reserved                  & 16 \\
-0x0F & n/a & Reserved                  & 16 \\ \hline
+0x00 & AO       & The first output register          & 16        \\
+0x01 & BO       & The second output register         & 16        \\
+0x02 & CO       & The third output register          & 16        \\
+0x03 & DO       & The fourth output register         & 16        \\
+0x04 & EO       & The fifth output register          & 16        \\
+0x05 & FO       & The sixth output register          & 16        \\
+0x06 & GO       & The seventh output register        & 16        \\
+0x07 & HO       & The eighth output register          & 16        \\
+0x08 & n/a      & Reserved                           & 16        \\
+0x09 & n/a      & Reserved                           & 16        \\
+0x0A & n/a      & Reserved                           & 16        \\
+0x0B & n/a      & Reserved                           & 16        \\
+0x0C & n/a      & Reserved                           & 16        \\
+0x0D & n/a      & Reserved                           & 16        \\
+0x0E & n/a      & Reserved                           & 16        \\
+0x0F & n/a      & Reserved                           & 16        \\ \hline \pagebreak[4]
 \hiderowcolors
 \multicolumn{4}{c}{\textbf{Special Operands A}} \\ \hline
 \showrowcolors
-0x10 & [ax+\#]  & The byte at: ax plus the immidiate & 8 \\
-0x11 & [bx+\#]  & The byte at: bx plus the immidiate & 8 \\
-0x12 & [cx+\#]  & The byte at: cx plus the immidiate & 8 \\
-0x13 & [dx+\#]  & The byte at: dx plus the immidiate & 8 \\
-0x14 & [fx+\#]  & The byte at: fx plus the immidiate & 8 \\
-0x15 & [pc+\#]  & The byte at: pc plus the immidiate & 8 \\
-0x16 & [sp+\#]  & The byte at: sp plus the immidiate & 8 \\
-0x17 & [\#]     & The byte at: the immidiate & 8 \\
-0x18 & @[ax+\#] & The word at: ax plus the immidiate & 16 \\
-0x19 & @[bx+\#] & The word at: bx plus the immidiate & 16 \\
-0x1A & @[cx+\#] & The word at: cx plus the immidiate & 16 \\
-0x1B & @[dx+\#] & The word at: dx plus the immidiate & 16 \\
-0x1C & @[fx+\#] & The word at: fx plus the immidiate & 16 \\
-0x1D & @[pc+\#] & The word at: pc plus the immidiate & 16 \\
-0x1E & @[sp+\#] & The word at: sp plus the immidiate & 16 \\
-0x1F & @[\#]    & The word at: the immidiate         & 16 \\ \hline
+0x10 & [ax+\#]  & The byte at: ax plus the immediate & 8         \\
+0x11 & [bx+\#]  & The byte at: bx plus the immediate & 8         \\
+0x12 & [cx+\#]  & The byte at: cx plus the immediate & 8         \\
+0x13 & [dx+\#]  & The byte at: dx plus the immediate & 8         \\
+0x14 & [fx+\#]  & The byte at: fx plus the immediate & 8         \\
+0x15 & [pc+\#]  & The byte at: pc plus the immediate & 8         \\
+0x16 & [sp+\#]  & The byte at: sp plus the immediate & 8         \\
+0x17 & [\#]     & The byte at: the immediate         & 8         \\
+0x18 & @[ax+\#] & The word at: ax plus the immediate & 16        \\
+0x19 & @[bx+\#] & The word at: bx plus the immediate & 16        \\
+0x1A & @[cx+\#] & The word at: cx plus the immediate & 16        \\
+0x1B & @[dx+\#] & The word at: dx plus the immediate & 16        \\
+0x1C & @[fx+\#] & The word at: fx plus the immediate & 16        \\
+0x1D & @[pc+\#] & The word at: pc plus the immediate & 16        \\
+0x1E & @[sp+\#] & The word at: sp plus the immediate & 16        \\
+0x1F & @[\#]    & The word at: the immediate         & 16        \\ \hline
 \hiderowcolors
 \multicolumn{4}{c}{\textbf{Special Operands B}} \\ \hline
 \showrowcolors
-0x10 & [ax+\#]  & Memory from: ax plus the immidiate & same as A \\
-0x11 & [bx+\#]  & Memory from: bx plus the immidiate & same as A \\
-0x12 & [cx+\#]  & Memory from: cx plus the immidiate & same as A \\
-0x13 & [dx+\#]  & Memory from: dx plus the immidiate & same as A \\
-0x14 & [fx+\#]  & Memory from: fx plus the immidiate & same as A \\
-0x15 & [pc+\#]  & Memory from: pc plus the immidiate & same as A \\
-0x16 & [sp+\#]  & Memory from: sp plus the immidiate & same as A \\
-0x17 & [\#]     & Memory from: the immidiate         & same as A \\
-0x18 & ax+\# & ax plus the immidiate & 16 \\
-0x19 & bx+\# & bx plus the immidiate & 16 \\
-0x1A & cx+\# & cx plus the immidiate & 16 \\
-0x1B & dx+\# & dx plus the immidiate & 16 \\
-0x1C & fx+\# & fx plus the immidiate & 16 \\
-0x1D & pc+\# & pc plus the immidiate & 16 \\
-0x1E & sp+\# & sp plus the immidiate & 16 \\
-0x1F & \#    & the immidiate         & 16 \\
+0x10 & [ax+\#]  & Memory from: ax plus the immediate & same as A \\
+0x11 & [bx+\#]  & Memory from: bx plus the immediate & same as A \\
+0x12 & [cx+\#]  & Memory from: cx plus the immediate & same as A \\
+0x13 & [dx+\#]  & Memory from: dx plus the immediate & same as A \\
+0x14 & [fx+\#]  & Memory from: fx plus the immediate & same as A \\
+0x15 & [pc+\#]  & Memory from: pc plus the immediate & same as A \\
+0x16 & [sp+\#]  & Memory from: sp plus the immediate & same as A \\
+0x17 & [\#]     & Memory from: the immediate         & same as A \\
+0x18 & ax+\#    & ax plus the immediate              & 16        \\
+0x19 & bx+\#    & bx plus the immediate              & 16        \\
+0x1A & cx+\#    & cx plus the immediate              & 16        \\
+0x1B & dx+\#    & dx plus the immediate              & 16        \\
+0x1C & fx+\#    & fx plus the immediate              & 16        \\
+0x1D & pc+\#    & pc plus the immediate              & 16        \\
+0x1E & sp+\#    & sp plus the immediate              & 16        \\
+0x1F & \#       & the immediate                      & 16        \\ \hline
 \end{longtable}
 \end{center}
-
-
-\chapter{Addressing}
-\label{ch:Addressing}
-\section{Bit and Byte Ordering}
-\section{Aligned and Misaligned Memory Access}
-
 
 \chapter{Instruction Set Summary}
 \label{ch:Instruction Set Summary}
 This chapter gives a summary on the instruction set of the ABCD processor. It will describe the types of instructions and the binary layout of the instructions.
 \section{Instruction Types}
-The instructions can be seperated in five types. Two of these types are not meant to be used. 
+The instructions can be separated in five types. Two of these types are not meant to be used. 
 \subsection{Move Instructions}
-The move instructions copy data from it's source operand to it's target operand. The simpelest move instruction is MOV and does just that. The rest of the move instructions are conditional move instructions, these only copy data when certain conditions are met. These conditions all have to do with previous calculations and use the flags register.
+The move instructions copy data from it's source operand to it's target operand. The simplest move instruction is MOV and does just that. The rest of the move instructions are conditional move instructions, these only copy data when certain conditions are met. These conditions all have to do with previous calculations and use the flags register.
 \begin{description}
 \item[MOVZ]: Move if the zero flag is set.
 \item[MOVNZ]: Move if the zero flag is clear.
@@ -410,7 +434,7 @@ The move instructions copy data from it's source operand to it's target operand.
 \item[MOVS>]: Move if the previous comparison of signed integers was greater.
 \end{description}
 \subsection{Addition and Subtraction Instructions}
-There preform binary addition and subtraction for both signed and unsigned integers. In all the addition instructions you can two's compliment negate one of the operands. A substraction instruction is an addition instruction with the B operand negated. There are three groups of addition/subtraction instructions:
+There preform binary addition and subtraction for both signed and unsigned integers. In all the addition instructions you can two's compliment negate one of the operands. A subtraction instruction is an addition instruction with the B operand negated. There are three groups of addition/subtraction instructions:
 \begin{description}
 \item[ADD / SUB]: Add/subtract the two operands.
 \item[ADD1 / SUB1]: Add/subtract the two operands and add/subtract 1.
@@ -442,25 +466,25 @@ Control Instruction change specific parts of the processor state. Unlike the mov
 \item[ISTR]: Writes to an background register.
 \item[ILD]: Writes from an background register.
 \item[OUT]: Writes to an output register.
-\item[IN]: Request input from a pheriperal.
+\item[IN]: Request input from a peripheral.
 \item[BACK]: Backup the most registers.
 \item[FRET]: Fully restore the last backup and marks and marks any running interrupt done.
 \item[PRET]: Restore the program counter and the stack pointer from the last backup and marks any running interrupt done.
 \item[FJMP]: Restore the program counter and the stack pointer from the last backup.
-\item[HLT]: Halts the processor untill a interrupt is triggered.
+\item[HLT]: Halts the processor until a interrupt is triggered.
 \item[NOP]: Does nothing but delay the processor a bit.
 \end{description}
 \subsection{Reserved Instructions}
-Reserved instructions are instructions with undefined behaviour, meaning they can do anything to the state of the CPU or the RAM. Reserved instructions should never be used in code. However, reserved instructions will never message pheripers, so it's impossible to change non-volatile memory or damage any components. Thus any problems that reserved instructions invoke directly will not persist after restarting the system. 
+Reserved instructions are instructions with undefined behaviour, meaning they can do anything to the state of the processor or the RAM. Reserved instructions should never be used in code. However, reserved instructions will never message peripherals, so it's impossible to change non-volatile memory or damage any components. Thus any problems that reserved instructions invoke directly will not persist after restarting the system. 
 \subsection{Artifact Instructions}
-Artifact instructions are instructions with defined behaviour, but aren't considererd a permanent part of the ABCD processor family. These instructions tend to only exist because it would take more parts to remove them than it takes to leave them in.
+Artifact instructions are instructions with defined behaviour, but aren't considered a permanent part of the ABCD processor family. These instructions tend to only exist because it would take more parts to remove them than it takes to leave them in.
 
 \section{Instruction Format}
 All instructions follow one single format. The format has four parts:
 \begin{description}
-\item[OP]: The opcode, this describes what operation will be excecuted by this instruction (see \autoref{app:Instruction Set Listings}).
+\item[OP]: The opcode, this describes what operation will be executed by this instruction (see \autoref{app:Instruction Set Listings}).
 \item[A]: Operand A, This describes what the instruction will use as output and secondary input (see \autoref{tab:List of Operands}).
-\item[B]: Operand B, This describes what the instruction will use primary input (see \autoref{tab:List of Operands}).
+\item[B]: Operand B, This describes what the instruction will use as primary input (see \autoref{tab:List of Operands}).
 \item[\#]: The immediate, This is number is used by some operands to add to it's data or offset it's address.
 \end{description}
 \begin{figure}[h!]
@@ -481,41 +505,110 @@ All instructions follow one single format. The format has four parts:
 \end{center}
 \end{figure}
 
-\chapter{Memory Management}
-\label{ch:Memory Management}
-\section{Segments}
-\subsection{Base}
-\subsection{Limit}
-\section{Code Segment (CS)}
-\section{Data Segment (DS)}
-\section{Segment Switching}
-\section{Changing Segments}
+%\chapter{Addressing and Memory Management}
+%\label{ch:Memory Management}
+%This chapter describes how an ABCD processor addresses and manages memory, and how to control the memory management. Note that in the chapter "memory" only refers to primary memory that is linked to the processor's memory input/output
+%\section{Addressing}
+%an ABCD processor uses 18-bit unsigned integers to address the memory, meaning an ABCD processor can access 256KiB of memory at most.   
+%\section{Bit and Byte Ordering}
+%\section{Aligned and Misaligned Memory Access}
+%\section{Segments}
+%\subsection{Base}
+%\subsection{Limit}
+%\section{Code Segment (CS)}
+%\section{Data Segment (DS)}
+%\section{Segment Switching}
+%\section{Changing Segments}
 
 \chapter{Interrupts}
 \label{ch:Interrupts}
+This chapter describes how the interrupts in an ABCD processor work and how to use them. Interrupts halt the normal code flow to handle an external request.
+\section{Starting an Interrupt}
+Everytime after running an instruction the processor will check if an interrupt is requested by a perhiperal. If there is and no system has disabled the interrupts (see \autoref{sec:Interrupt Enabling/Disabling}) then an interrupt will start. First the processor will create a backup of the processor's state (see \autoref{subsec:Backup}). Then it change the program counter and segment index registers their data to their respective interrupt register's data. To prevent any interrupts from starting while this interrupt handler is still busy it will also place an internal lock on interrupts. When this is all done the interrupt handler code starts to run like regular code.
+\subsection{Interrupt Start in Pseudocode}
+\begin{algorithmic}
+\State \Call{(PreviousInstruction)}{}
+\If {$InterruptRequest \wedge I \wedge \neg InterruptRunning$}
+\State $bax \gets ax$
+\State $bbx \gets bx$
+\State $bcx \gets cx$
+\State $bdx \gets dx$
+\State $bex \gets ex$
+\State $btm \gets tm$
+\State $bsp \gets sp$
+\State $bpc \gets pc$
+\State $bsf \gets sf$ \Comment Backup the segment and flag registers
+\State $pc \gets ipc$ \Comment Jump to the interrupt handler code
+\State $s \gets is$ \Comment Context switch to the interrupt handler
+\State \Call{MarkInterruptStarted}{ } \Comment Lock the internal lock that prevents interrupts
+\EndIf
+\State \Call{(NextInstruction)}{}
+\end{algorithmic}
+
 \section{Interrupt Enabling/Disabling}
 \label{sec:Interrupt Enabling/Disabling}
+There are multiple systems that can prevent interrupts from triggering.
 \subsection{Interrupt Enabled Flag}
+The interrupt enabled flag is provided to allow code to disable interrupts hassle free. The interrupt enabled flag is a regular flag that resides in the flag register. Thus it backed up and restored during interrupts just like other flags. However, unlike other flags the WRI instruction can directly write to this flag, allowing to change this flag easily. This flag is especially useful in situations where you need to temporarly disable interrupts to safely run code that use the output registers or the backup system.
 \subsection{Internal Interrupt Mask}
+The internal interrupt mask is meant to prevent interrupts triggering while another interrupt is being handled. It does so by masking all interrupts away as soon as an interrupt starts. When FRET or PRET is called the interrupt handler is considered done and the masking is stopped. If there is still an interrupt waiting as soon as the interrupt handler is done it will trigger immidiately (given that no other systems are blocking the interrupt).
 \subsection{Programmable Interrupt Controller (PIC)}
+The PIC in the standard ABCD computer has an internal masking system that can prevent interrupt request from seperate sources. However, this is beyond the scope of this document.
 \section{State Preservation}
 \label{sec:State Preservation}
+The ABCD processor uses backup registers to preserve the state of the processor during interrupts. Many registers have their respective backup register. The registers that have their respective backup register and thus preserve their state after interupts are:
+\begin{itemize}
+\item All the foreground registers
+\item The flag registers
+\item The segment index registers (CS and DS)
+\end{itemize}
+Note that the output registers do not have respective backup registers, so if any interrupt triggers between an OUT and an IN instruction the interrupt handler could change output registers, harboring unexpected results. So if any interrupt ever writes to the output registers (likely) then any OUT instruction outside of an interrupt handler should be executed only if interrupts are disabled. 
 \subsection{Backup}
+\label{subsec:Backup}
+When a backup occures all backup registers have their data overwritten with the data from their respective register. The previous backup is completely removed in the process. A backup occures under two circumstances: An interrupt is started, or a BACK instruction is executed.
 \subsection{Full Restore}
+When a full restore occurres all backup registers will have their data written to their respective register. The state of processor will be mostly the same as when the last backup occured. The state can differ somewhat if since the last backup different data has been written to the background registers or output registers. A full restore won't effect the backup registers, so a single backup can be restored multiple times. A full restore only occurres when a FRET instruction is executed.
 \subsection{Partial Restore}
-\section{Interrupt Service Routine (ISR)}
-\subsection{Interrupt Far Jump}
+When a partial restore occurres some backup registers will have their data written to their respective register. The only registers that are restored by a partial restore are:
+\begin{itemize}
+\item The program counter
+\item The flag registers
+\item The segment index registers (CS and DS)
+\end{itemize}
+A partial restore occures when a PRET or FJMP instruction is called. A partial restore is useful to jump back to code while keeping control over the other registers
+\section{Context switching}
+For many reasons it might be desireabla to switch context, this section will briefly explain how to go about doing this in certain situations.
+\subsection{Far Jumps}
+Sometimes code paths need to flow to other segments. This can be achieved by using far jumps (FJMP). The backup registers for the program counter and segment indicies are available as background registers. So to do a far jump the new address and segment indicies need to be written to those background registers, and then FJMP should be called. However, There are a few important things to note. First, if the data segment is changed the old stack pointer usually isn't correct in the new context. Secondly, The far jump will wipe the flag registers since the segment index and flag registers share one backup register. Lastly, if a far jump resides in an interrupt handler care must be taken to store the old backups somewhere so the interrupt handler can correctly return to context.
 \subsection{Return to Context}
+Returning to context is a simple and quick procedure. If FRET is executed in a interrupt handler it will properly return to the context and state before the interrupt started. That only stands true as long as no backup registers have changed since the start of the interrupt. If an far jump has been made inbetween the correct program counter, segment index and flag backup registers must be restored manually. 
 \subsection{Switch Context}
+Context switching is more complex than the other two situations. First you need to save the backup registers to the memory to switching back. This can be done like this:
+\begin{enumerate}
+\item save all GPRs to a constant place in memory (the GPRs are not changed by the start of the interrupt, so these hold the same value as their backup as long as they aren't changed by the interrupt handler)
+\item save bpc and bsf to the memory
+\end{enumerate}
+The next step is to load the the new state and context to switch to. this can be done like this:
+\begin{enumerate}
+\item load the new bpc and bsf from the memory
+\item load all the GPR's from the memory
+\item call PRET to restore the context
+\end{enumerate}
+And that way the processor will end up following a new code path outside interrupts.
 
 \chapter{I/O Conventions}
 \label{ch:I/O Conventions}
+This chapter describes how input and output functions in an ABCD processor.
 \section{Reading Input}
+To fetch input the IN instruction is used. This instruction sends out a number given by operand B. This number is meant to be a pheriperal ID that tells what pheriperal the input request is send to, but this number can be used differently in non-standard usages of the ABCD processor. A bit after requesting input the 16-bit input port will be read and written to operand A. If there is no input it the input is considered to be 0x0000. 
 \section{Writing Output}
+The OUT instruction writes operand B to a output register selected by operand A. These output registers are readable by pheriperals at all times, however, in standard ABCD processor based systems the output will only be read by a perhiperal if input is requested from the perhiperal. So to output data in standard ABCD processor based systems one or more OUT instructions need to be executed to write the correct data to the output registers and then the IN instruction must be used to tell a certain perhiperal to read the output registers. What the perhiperal does with the output after that point is specific to that perhiperal.
 \subsection{Problem with Interrupts}
+The output registers aren't backed up like most registers when an interrupt is called, so changes an interrupt makes to the output register could mess up I/O operations. To prevent this it's advisable to disable interrupt during I/O operations using the WRI instruction.
 
 \chapter{Instruction Set}
 \label{ch:Instruction Set}
+This chapter gives information about every instruction. It tells what variant's there are, what opcode they have, what mnemonics they have, what they do, and what flags they effect.
 \clearpage
 
 % MOVZ
@@ -523,7 +616,7 @@ All instructions follow one single format. The format has four parts:
 0x00: MOVZ a b \\
 0x00: MOV= a b \emph{(Alternative notation)}
 }{
-Writes B to A if the zero flag is set. This instruction can also be used to only write B to A if, in the last comparison, B was equal to A. The alternative Memnonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+Writes B to A if the zero flag is set. This instruction can also be used to only write B to A if, in the last comparison, B was equal to A. The alternative Mnemonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
 \begin{algorithmic}
 \If {$Z$}
@@ -543,7 +636,7 @@ alternative pseudocode:
 0x01: MOVNZ a b \\
 0x01: MOV!= a b \emph{(Alternative notation)}
 }{
-Writes B to A if the zero flag is clear. This instruction can also be used to only write B to A if, in the last comparison, B was unequal to A. The alternative Memnonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+Writes B to A if the zero flag is clear. This instruction can also be used to only write B to A if, in the last comparison, B was unequal to A. The alternative Mnemonic MOV= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
 \begin{algorithmic}
 \If {$\neg Z$}
@@ -641,7 +734,7 @@ Writes B to A if the overflow flag is clear.
 0x08: MOVC a b \\
 0x08: MOVU> a b \emph{(Alternative notation)}
 }{
-Writes B to A if the carry flag is set. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was greater than A. The alternative Memnonic MOVU> was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+Writes B to A if the carry flag is set. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was greater than A. The alternative Mnemonic MOVU> was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
 \begin{algorithmic}
 \If {$C$}
@@ -661,7 +754,7 @@ alternative pseudocode:
 0x09: MOVNC a b \\
 0x09: MOVU<= a b \emph{(Alternative notation)}
 }{
-Writes B to A if the carry flag is clear. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was smaller than or equal to A. The alternative Memnonic MOVU<= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
+Writes B to A if the carry flag is clear. This instruction can also be used to only write B to A if, in the last comparison of unsigned numbers, B was smaller than or equal to A. The alternative Mnemonic MOVU<= was provided for this use. The comparison use of this instruction can only be expected to work if the last calculation was a compare or subtract instruction, and the used status flags haven't changed in the meanwhile.
 }{
 \begin{algorithmic}
 \If {$\neg C$}
@@ -851,7 +944,7 @@ Writes B to output register A.
 \instruction{IN}{\underline{In}put}{
 0x17: IN a b
 }{
-Request input from pheriperal B and write the returned input to A.
+Request input from peripheral B and write the returned input to A.
 }{
 \begin{algorithmic}
 \State $a\gets \Call{RequestInputFrom}{b}$
@@ -926,10 +1019,10 @@ Restores some of the registers.
 \instruction{HLT}{\underline{H}a\underline{lt}}{
 0x1C: HLT \_ \_
 }{
-Halts the CPU until an external interrupt is triggered and resumes.
+Halts the processor until an external interrupt is triggered and resumes.
 }{
 \begin{algorithmic}
-\State \Call{HaltCPU}{ }
+\State \Call{Haltprocessor}{ }
 \end{algorithmic}
 }{}
 
@@ -937,7 +1030,7 @@ Halts the CPU until an external interrupt is triggered and resumes.
 \instruction{NOP}{\underline{N}o \underline{op}erations}{
 0x1D: NOP \_ \_
 }{
-Does nothing but delay the cpu a minimal amount of cycles. 
+Does nothing but delay the processor a minimal amount of cycles. 
 }{
 \begin{algorithmic}
 \If {$false$} \Comment NOP is implemented as a do never conditional
@@ -1032,32 +1125,32 @@ adds A and 1 to B and writes the answer to A. The addition is checked on overflo
 }{Z, S, P, O and C}
 
 % ADDC
-\instruction{ADDC / SUBB}{\underline{Add}ition with \underline{c}arry / \underline{Sub}traction with \underline{b}orrow}{
-0x28: ADDC a b \\
-0x29: ADDC -a b \\
-0x2A: ADDC a -b \\
-0x2A: SUBB a b \emph{(Alternative notation)}
-}{
-adds A to B and writes the answer to A, however, if the carry flag is set an extra 1 will be added to the sum. The addition is checked on overflow and carry and the answer is also evaluated to update the status flags. Both operands can be Two's Complement Negated before the operation in the same instruction. This is marked by the '-' before the operand. If one of the operands is negated the extra 1 will be negated as well.
-}{
-\begin{algorithmic}
-\State $y\gets (-)a + (-)b + (-)C$
-\State $a\gets y$
-\State $O, C\gets \Call{CheckAddition}{ }$
-\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
-\end{algorithmic}
-}{Z, S, P, O and C}
-
-% 
-\instruction{}{\underline{}}{
-0x:  a b
-}{
-
-}{
-\begin{algorithmic}
-\State $a\gets b$
-\end{algorithmic}
-}{}
+%\instruction{ADDC / SUBB}{\underline{Add}ition with \underline{c}arry / \underline{Sub}traction with \underline{b}orrow}{
+%0x28: ADDC a b \\
+%0x29: ADDC -a b \\
+%0x2A: ADDC a -b \\
+%0x2A: SUBB a b \emph{(Alternative notation)}
+%}{
+%adds A to B and writes the answer to A, however, if the carry flag is set an extra 1 will be added to the sum. The addition is checked on overflow and carry and the answer is also evaluated to update the status flags. Both operands can be Two's Complement Negated before the operation in the same instruction. This is marked by the '-' before the operand. If one of the operands is negated the extra 1 will be negated as well.
+%}{
+%\begin{algorithmic}
+%\State $y\gets (-)a + (-)b + (-)C$
+%\State $a\gets y$
+%\State $O, C\gets \Call{CheckAddition}{ }$
+%\State $Z, S, P\gets \Call{EvaluateAnswer}{y}$
+%\end{algorithmic}
+%}{Z, S, P, O and C}
+%
+%% 
+%\instruction{}{\underline{}}{
+%0x:  a b
+%}{
+%
+%}{
+%\begin{algorithmic}
+%\State $a\gets b$
+%\end{algorithmic}
+%}{}
 
 
 % Appendix
@@ -1070,10 +1163,18 @@ adds A to B and writes the answer to A, however, if the carry flag is set an ext
 \hiderowcolors
 \caption{List of instructions sorted by opcode} 
 \label{tab:opcode_sorted_instructions_list} \\
-\multicolumn{3}{c}{\textbf{Opcode}} & \multirow{2}{*}{\textbf{Memnonic}} & \multirow{2}{*}{\textbf{Operand A}} & \multirow{2}{*}{\textbf{Operand B}} \\
+\multicolumn{3}{c}{\textbf{Opcode}} & \multirow{2}{*}{\textbf{Mnemonic}} & \multirow{2}{*}{\textbf{Operand A}} & \multirow{2}{*}{\textbf{Operand B}} \\
+\textbf{Decimal} & \textbf{Hex} & \textbf{Binary} &  &  &  \\ \hline 
+\showrowcolors 
+\endfirsthead
+%
+\hiderowcolors
+\caption{List of instructions sorted by opcode (Continued)} \\
+\multicolumn{3}{c}{\textbf{Opcode}} & \multirow{2}{*}{\textbf{Mnemonic}} & \multirow{2}{*}{\textbf{Operand A}} & \multirow{2}{*}{\textbf{Operand B}} \\
 \textbf{Decimal} & \textbf{Hex} & \textbf{Binary} &  &  &  \\ \hline 
 \showrowcolors 
 \endhead
+%
 0  & 0x00 & 000000 & MOVZ  \& MOV=   & W?    & R?  \\
 1  & 0x01 & 000001 & MOVNZ \& MOV!=  & W?    & R?  \\
 2  & 0x02 & 000010 & MOVS            & W?    & R?  \\
@@ -1141,18 +1242,17 @@ adds A to B and writes the answer to A, however, if the carry flag is set an ext
 \end{longtable}
 \end{center}
 
-\chapter{Simplified Mnemonics}
-
-\chapter{Common Procedures}
-
-\chapter{Standard Peripherals}
-\section{Programmable Interrupt Controller (PIC)}
-\section{Keyboard}
-\section{Programmable Interrupt Timer (PIT)}
-\section{Sound Card}
-\section{Graphical Card}
-\section{Memory Control Hub (MCH)}
-\section{Segements and Out Of Bounds Exception}
-
+%\chapter{Simplified Mnemonics}
+%
+%\chapter{Common Procedures}
+%
+%\chapter{Standard Peripherals}
+%\section{Programmable Interrupt Controller (PIC)}
+%\section{Keyboard}
+%\section{Programmable Interrupt Timer (PIT)}
+%\section{Sound Card}
+%\section{Graphical Card}
+%\section{Memory Control Hub (MCH)}
+%\section{Segments and Out Of Bounds Exception}
 \end{document}
 
